@@ -7,7 +7,7 @@ A terraform module to create Cloudera CDP Public Cloud prerequisite resources.
 ### Azure
 ```
 module "cdp-prerequisite" {
-  source = "git@github.com:nicknameyu/cdp-prerequisite-module.git//azure?ref=main"
+  source = "${Path to this repo}//azure?ref=main"
   create_resource_group = false                         # Optional. Default to true.
   resource_group_name = "prerequisite-test"             # Mandatory. 
   managed_id = {                                        # Mandatory
