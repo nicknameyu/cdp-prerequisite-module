@@ -42,7 +42,6 @@ resource "aws_iam_policy" "log" {
 resource "aws_iam_role" "idbroker" {
   name                = var.role_names.idbroker
   assume_role_policy  = file("${path.module}/policies/aws-cdp-ec2-role-trust-policy.json")
-  managed_policy_arns = [aws_iam_policy.assume.arn, aws_iam_policy.log.arn]
 
   tags = var.tags
 }

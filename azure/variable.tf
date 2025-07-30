@@ -12,44 +12,6 @@ variable "location" {
   default = "westus"
 }
 
-########### mandatory prerequisites #############
-variable "create_resource_group" {
-  description = "If true, resource group will be created. If false, resource group must be existing."
-  type = bool
-  default = true
-}
-variable "resource_group_name" {
-  type = string
-}
-variable "managed_id" {
-  description = "The name of the required managed identities."
-  type = object({
-    assumer    = string
-    dataaccess = string
-    logger     = string
-    ranger     = string
-  })
-}
-
-variable "obj_storage" {
-  type = object({
-    storage_account_name   = string
-    data_container_name    = string
-    logs_container_name    = string
-    backups_container_name = string
-  })
-  description = "The names of the ADLS storage account and containers."
-}
-variable "obj_storage_performance" {
-  type = object({
-    account_tier = string
-    replication  = string
-  })
-  default = {
-    account_tier = "Standard"
-    replication  = "LRS"
-  }
-}
 
 #### Optional prerequisite ####
 
@@ -84,16 +46,5 @@ variable "file_storage_performance" {
     replication  = "LRS"
   }
 }
-variable "raz_mi_name" {
-  description = "RAZ managed identity name."
-  type        = string
-  default     = null
-}
-variable "dw_mi" {
-  description = "The name of the custom role for data warehouse managed identity. If not provided, the custom role won't be created."
-  type = object({
-    managed_identiy_name = string
-    custom_role_name     = string
-  })
-  default = null
-}
+
+
