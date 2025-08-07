@@ -1,5 +1,6 @@
 # Change log for module cdp-prerequisite for Azure
-
+## v0.2.0 Rebuild azure module
+- Break one module into 5 modules to adapt with different requirement. 
 ## v0.1.1 AWS module
 - Create CDP prerequiste resources
 - Create CMK key and related permissions. 

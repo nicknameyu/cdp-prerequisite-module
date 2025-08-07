@@ -36,4 +36,4 @@ terraform.rc
 .terraform.lock.hcl
 
 
-test/*
+*test/*

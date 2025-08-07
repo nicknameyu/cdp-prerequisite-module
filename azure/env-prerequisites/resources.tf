@@ -20,8 +20,19 @@ resource "azurerm_storage_account" "cdp" {
   account_replication_type = var.obj_storage_performance.replication
   account_kind             = "StorageV2"
   is_hns_enabled           = true
+  identity {
+    // This part is to prepare the possibility that an environment may need CMK to encrypt the storage account. 
+    type = "SystemAssigned, UserAssigned"
+    identity_ids = [ azurerm_user_assigned_identity.managed_id["dataaccess"].id]
+  }
 
   tags = var.tags
+  lifecycle {
+    // the CMK key could be changed in the future.
+    ignore_changes = [
+      customer_managed_key
+    ]
+  }
 }
 
 resource "azurerm_storage_container" "containers" {
@@ -64,4 +75,7 @@ output "managed_identities" {
     ranger     = azurerm_user_assigned_identity.managed_id["ranger"].id
     raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].id
   }
+}
+output "storage_account_id" {
+  value = azurerm_storage_account.cdp.id
 }

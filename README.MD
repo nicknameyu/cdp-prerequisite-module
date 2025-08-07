@@ -5,50 +5,12 @@ A terraform module to create Cloudera CDP Public Cloud prerequisite resources.
 ## Usuage:
 
 ### Azure
-```
-module "cdp-prerequisite" {
-  source = "${Path to this repo}//azure?ref=main"
-  create_resource_group = false                         # Optional. Default to true.
-  resource_group_name = "prerequisite-test"             # Mandatory. 
-  managed_id = {                                        # Mandatory
-    assumer    = "cdp-assumer"
-    dataaccess = "cdp-dataaccess"
-    logger     = "cdp-logger"
-    ranger     = "cdp-ranger"
-  }
-
-  tags = {                                             # Optional. Default to null
-    owner = "cdp user"
-    usecase = "testing"
-  }
-
-  obj_storage = {                                      # Mandatory
-    storage_account_name   = "cdpstorage"
-    data_container_name    = "data"
-    logs_container_name    = "logs"
-    backups_container_name = "backups"
-  }
-  file_storage = {                                     # Optional. For ML only.
-    storage_account_name = "cdpfilestorage"
-    file_share_name      = "ml-fileshare"
-    subnet_ids           = [
-      data.azurerm_subnet.default.id,
-      data.azurerm_subnet.snet1.id
-    ]
-  }
-
-  cmk = {                                             # Optional
-    kv_name = "mycdpkeyvault"
-    key_name = "cdpkey"
-    spn_object_id = "a37a577a-4502-4c7d-b6d7-8c717ee6e561"
-  }
-  raz_mi_name = "my-cdp-raz"                         # optional
-  dw_mi       = {                                     # Optional
-    managed_identiy_name = "cdp-dw-identity"
-    custom_role_name     = "CDP DW Role"
-  }
-}
-```
+There are 5 modules in Azure directory. 
+- `service-principal` module is to create service principal for CDP to communicate with a user's Azure subscription. Some users have different IAM team to manage the service principal, custom roles, and role assignment. So this one has to be independent from others. 
+- `env-prerequisites` module is to create environment fundation prerequisites including storage account, managed identities, as well as the role assignments between the managed identities and the resources.
+- `data-service-prerequisites` module creates a custom role and assign the custom role to the Datalake Admin managed identity. 
+- `cmk-prerequisites` module creates Azure Key Vault, key, as well as access policies for SPN, the managed identity for encyption, and the runner of this module. 
+- `nfs-prerequisites` module creates an NFS service on an Azure storage account, and encrypt it if necessary. 
 
 ### AWS
 #### Variables
