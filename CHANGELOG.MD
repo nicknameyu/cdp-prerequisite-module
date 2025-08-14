@@ -1,4 +1,9 @@
 # Change log for module cdp-prerequisite for Azure
+
+## v0.2.1 azure adjustment
+- add one new module `cdp-custom-role-permissions` to calculate required permissions. 
+- adjust other modules accordingly. 
+
 ## v0.2.0 Rebuild azure module
 - Break one module into 5 modules to adapt with different requirement. 
 ## v0.1.1 AWS module

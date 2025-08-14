@@ -76,6 +76,14 @@ output "managed_identities" {
     raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].id
   }
 }
-output "storage_account_id" {
-  value = azurerm_storage_account.cdp.id
+output "storage_account" {
+  value = {
+    resource_group_name  = local.resource_group_name 
+    storage_account_name = azurerm_storage_account.cdp.name
+    storage_account_id   = azurerm_storage_account.cdp.id
+    data_container       = var.storage_locations.data
+    log_container        = var.storage_locations.logs
+    backup_container     = var.storage_locations.backups
+  }
 }
+

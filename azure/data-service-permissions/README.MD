@@ -11,6 +11,9 @@ This module support using an existing custom role or creating a new custom role.
 
 ## Usage
 - `subscription_id`: Azure subscription ID. The role assingment will be on the subscription level.
-- `dw_custom_role`: name of the custom role.
-- `create_dw_custom_role`: switch for whether to create a new custom role or use an existing custom role.
-- `dataaccess_mi`: the managed identity to be used for the service.
+- `custom_role_name`: name of the custom role.
+- `create_custom_role`: switch for whether to create a new custom role or use an existing custom role.
+- `managed_identity_id`: the managed identity to be used for the service.
+- `enable_cmk_rbac`: This is to enable CMK permissions. Default to `true`. 
+- `enable_dw`: This is to enable Data Warehouse. Default to `true`.
+- `enable_liftie`: This is to enable all Liftie based data services including Data Engineering, Data Flow, Cloudera AI. Default to `true`.

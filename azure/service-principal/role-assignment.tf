@@ -13,16 +13,15 @@ resource "time_sleep" "custom_role" {
   create_duration = var.create_custom_role ? "300s" : "1s"
 }
 
-locals {
-  merged_actions = distinct(concat(var.datahub_actions,
-                            var.enable_dw ? var.dw_actions : [],
-                            var.enable_cmk ? var.cmk_actions : [],
-                            var.enable_liftie ? var.liftie_actions : [],
-                            var.enable_de ? var.de_actions : []
-                            )
-                           )
-  merged_data_actions = distinct(concat(var.data_actions, var.enable_cmk ? var.cmk_data_actions : []))
+
+module "custom_role_permissions" {
+  source          = "../cdp-custom-role-permissions"
+  enable_cmk_rbac = var.enable_cmk_rbac
+  enable_dw       = var.enable_dw
+  enable_liftie   = var.enable_liftie
+  enable_de       = var.enable_de
 }
+
 resource "azurerm_role_definition" "reduced" {
   count       = var.create_custom_role ? 1:0
   name        = var.custom_role_name
@@ -31,8 +30,8 @@ resource "azurerm_role_definition" "reduced" {
 
 
   permissions {
-    actions     = local.merged_actions
-    data_actions = local.merged_data_actions
+    actions     = module.custom_role_permissions.spn_permissions.actions
+    data_actions = module.custom_role_permissions.data_actions
   }
 
   assignable_scopes = [

@@ -1,13 +1,12 @@
 
 #### custom role for Data Services ###
-locals {
-  merged_actions = distinct(concat(
-                              var.enable_dw ? var.dw_actions : [],
-                              var.enable_liftie ? var.liftie_actions : [],
-                              var.enable_de ? var.de_actions : []
-                              )
-                           )
+module "custom_role_permissions" {
+  source          = "../cdp-custom-role-permissions"
+  enable_cmk_rbac = var.enable_cmk_rbac
+  enable_dw       = var.enable_dw
+  enable_liftie   = var.enable_liftie
 }
+
 resource "azurerm_role_definition" "ds" {
   count       = var.create_custom_role ? 1:0
   name        = var.custom_role_name
@@ -15,7 +14,8 @@ resource "azurerm_role_definition" "ds" {
   description = "Custom role for Cloudera Data Services"
 
   permissions {
-    actions     = local.merged_actions
+    actions      = module.custom_role_permissions.mi_permissions.actions
+    data_actions = module.custom_role_permissions.mi_permissions.data_actions
 
   }
 

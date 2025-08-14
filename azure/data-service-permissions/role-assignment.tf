@@ -14,12 +14,12 @@ data "azurerm_user_assigned_identity" "dataaccess" {
 
 locals {
   role_assignment = var.custom_role_name == null ? null : {
-    dw1  = {
+    ds1  = {
       principal_id = data.azurerm_user_assigned_identity.dataaccess.principal_id
       scope = "/subscriptions/${var.subscription_id}"
       role  = var.custom_role_name
     },
-    dw2 = {                                                                                     // Attention: this one is not listed in document, but it is necessary
+    ds2 = {                                                                                     // Attention: this one is not listed in document, but it is necessary
       principal_id = data.azurerm_user_assigned_identity.dataaccess.principal_id
       scope = "/subscriptions/${var.subscription_id}"
       role  = "Managed Identity Operator"
