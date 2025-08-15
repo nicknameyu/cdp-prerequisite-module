@@ -1,26 +1,14 @@
 
 ### Data Warehouse Custom Role Assignment #########
 locals {
-  resource_id_parts = split("/", var.managed_identity_id)
-
-  resource_group_name = element(local.resource_id_parts, 4)
-  managed_identity_name = element(local.resource_id_parts, length(local.resource_id_parts) - 1) 
-
-}
-data "azurerm_user_assigned_identity" "dataaccess" {
-  resource_group_name = local.resource_group_name
-  name = local.managed_identity_name
-}
-
-locals {
   role_assignment = var.custom_role_name == null ? null : {
     ds1  = {
-      principal_id = data.azurerm_user_assigned_identity.dataaccess.principal_id
+      principal_id = var.mi_principal_id
       scope = "/subscriptions/${var.subscription_id}"
       role  = var.custom_role_name
     },
     ds2 = {                                                                                     // Attention: this one is not listed in document, but it is necessary
-      principal_id = data.azurerm_user_assigned_identity.dataaccess.principal_id
+      principal_id = var.mi_principal_id
       scope = "/subscriptions/${var.subscription_id}"
       role  = "Managed Identity Operator"
     }

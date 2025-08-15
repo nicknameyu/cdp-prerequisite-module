@@ -15,7 +15,7 @@ resource "time_sleep" "custom_role" {
 
 
 module "custom_role_permissions" {
-  source          = "../cdp-custom-role-permissions"
+  source          = "github.com/nicknameyu/cdp-prerequisite-module/azure/cdp-custom-role-permissions"
   enable_cmk_rbac = var.enable_cmk_rbac
   enable_dw       = var.enable_dw
   enable_liftie   = var.enable_liftie
@@ -31,10 +31,10 @@ resource "azurerm_role_definition" "reduced" {
 
   permissions {
     actions     = module.custom_role_permissions.spn_permissions.actions
-    data_actions = module.custom_role_permissions.data_actions
+    data_actions = module.custom_role_permissions.spn_permissions.data_actions
   }
 
   assignable_scopes = [
-    "subscriptions/${var.subscription_id}", # /subscriptions/00000000-0000-0000-0000-000000000000
+    "/subscriptions/${var.subscription_id}", # /subscriptions/00000000-0000-0000-0000-000000000000
   ]
 }

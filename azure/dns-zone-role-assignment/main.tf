@@ -1,5 +1,5 @@
 module "custom_role_permissions" {
-  source          = "../cdp-custom-role-permissions"
+  source          = "github.com/nicknameyu/cdp-prerequisite-module/azure/cdp-custom-role-permissions"
 }
 
 provider "azurerm" {

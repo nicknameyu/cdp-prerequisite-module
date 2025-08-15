@@ -67,13 +67,22 @@ resource "azurerm_user_assigned_identity" "raz" {
   tags = var.tags
 }
 
-output "managed_identities" {
+output "mi_ids" {
   value = {
     assumer    = azurerm_user_assigned_identity.managed_id["assumer"].id
     dataaccess = azurerm_user_assigned_identity.managed_id["dataaccess"].id
     logger     = azurerm_user_assigned_identity.managed_id["logger"].id
     ranger     = azurerm_user_assigned_identity.managed_id["ranger"].id
     raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].id
+  }
+}
+output "mi_principal_ids" {
+  value = {
+    assumer    = azurerm_user_assigned_identity.managed_id["assumer"].principal_id
+    dataaccess = azurerm_user_assigned_identity.managed_id["dataaccess"].principal_id
+    logger     = azurerm_user_assigned_identity.managed_id["logger"].principal_id
+    ranger     = azurerm_user_assigned_identity.managed_id["ranger"].principal_id
+    raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].principal_id
   }
 }
 output "storage_account" {

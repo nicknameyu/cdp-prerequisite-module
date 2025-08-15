@@ -1,7 +1,7 @@
 
 #### custom role for Data Services ###
 module "custom_role_permissions" {
-  source          = "../cdp-custom-role-permissions"
+  source          = "github.com/nicknameyu/cdp-prerequisite-module/azure/cdp-custom-role-permissions"
   enable_cmk_rbac = var.enable_cmk_rbac
   enable_dw       = var.enable_dw
   enable_liftie   = var.enable_liftie

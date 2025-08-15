@@ -12,9 +12,9 @@ variable "subscription_id" {
   type = string
   description = "Azure subscriptino ID to be used to deploy the resources."
 }
-variable "managed_identity_id" {
+variable "mi_principal_id" {
   type = string
-  description = "Data access managed identity to be granted the DW custom role."
+  description = "Data access managed identity principal ID to be granted the DW custom role."
 }
 
 
