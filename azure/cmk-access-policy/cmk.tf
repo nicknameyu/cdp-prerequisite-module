@@ -26,6 +26,7 @@ resource "azurerm_key_vault" "kv" {
   count                      = var.create_keyvault ? 1:0
   name                       = var.key_vault_name
   location                   = var.location
+  enable_rbac_authorization  = var.enable_rbac_authorization
   resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_subscription.current.tenant_id
   sku_name                   = "premium"
@@ -34,6 +35,13 @@ resource "azurerm_key_vault" "kv" {
   tags                       = var.tags
 }
 
+### Role assignments
+resource "azurerm_role_assignment" "cmk" {
+  for_each             = var.enable_rbac_authorization ? {spn = var.spn_object_id, mi = data.azurerm_user_assigned_identity.mi.principal_id } : {}
+  principal_id         = each.value
+  scope                = "/subscriptions/${var.subscription_id}"
+  role_definition_name = "Key Vault Crypto User"
+}
 ### Create access policies 
 locals {
   key_vault_id    = var.create_keyvault ? azurerm_key_vault.kv[0].id : data.azurerm_key_vault.kv[0].id
@@ -69,7 +77,7 @@ locals {
   }
 }
 resource "azurerm_key_vault_access_policy" "kv" {
-  for_each     = local.access_policies
+  for_each     = var.enable_rbac_authorization ? {}:local.access_policies
   key_vault_id = local.key_vault_id
   tenant_id    = data.azurerm_subscription.current.tenant_id
   object_id    = each.value.object_id

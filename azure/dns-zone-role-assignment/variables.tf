@@ -1,7 +1,4 @@
-variable "subscription_id" {
-  type = string
-  description = "Azure subscriptino ID to be used to deploy the resources."
-}
+
 variable "custom_role_name" {
   type = string
   default = null
@@ -14,4 +11,9 @@ variable "assign_scope" {
   type = string
   default = null
   description = "Assign scope of the DNS zone role. Default to subscription level. "
+}
+variable "use_custom_role" {
+  default = false
+  type = bool
+  description = "Switch of using build-in role or custom role. Default to false."
 }

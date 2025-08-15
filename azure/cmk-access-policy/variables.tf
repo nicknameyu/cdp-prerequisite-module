@@ -55,3 +55,9 @@ variable "storage_account_id" {
   default = null
   description = "The ID of the storeage account to be encrypted with the CMK."
 }
+
+variable "enable_rbac_authorization" {
+  default = false
+  type = bool
+  description = "Control rbac authentication if it is a new created key vault. "
+}
