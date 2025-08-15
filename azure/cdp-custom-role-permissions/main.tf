@@ -6,13 +6,13 @@ locals {
                                     var.enable_de ? var.de_actions : []
                                     )
                            )
-  spn_reduced_data_actions = distinct(concat(var.env_reduced_permission_data_actions, var.enable_cmk_rbac ? var.cmk_rbac_data_actions : []))
+  spn_reduced_data_actions = var.env_reduced_permission_data_actions
   mi_actions  = distinct(concat(
                               var.enable_dw ? var.dw_actions : [],
                               var.enable_liftie ? var.liftie_actions : []
                               )
                          )
-  mi_data_actions = distinct(concat(var.env_reduced_permission_data_actions, var.enable_cmk_rbac ? var.cmk_rbac_data_actions : []))
+  mi_data_actions = var.env_reduced_permission_data_actions
 }
 
 output "spn_permissions" {
