@@ -1,4 +1,4 @@
-variable "enable_cmk_rbac" {
+variable "enable_cmk" {
   type = bool
   default = true
   description = "Enable CMK permission for RBAC. Default to true."
@@ -17,8 +17,6 @@ variable "cmk_rbac_actions" {
       "Microsoft.Compute/diskEncryptionSets/read",
       "Microsoft.Compute/diskEncryptionSets/write",
       "Microsoft.Compute/diskEncryptionSets/delete",
-      "Microsoft.DBforPostgreSQL/servers/read",
-      "Microsoft.DBforPostgreSQL/servers/keys/write",
       "Microsoft.KeyVault/vaults/accessPolicies/write"
     ]
 }

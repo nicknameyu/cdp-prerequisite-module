@@ -74,6 +74,7 @@ variable "env_reduced_permission_actions" {
       "Microsoft.DBforPostgreSQL/flexibleServers/firewallRules/write",
       "Microsoft.DBforPostgreSQL/flexibleServers/start/action",                // added base on testing 03/25/2024
       "Microsoft.DBforPostgreSQL/flexibleServers/stop/action",                 // added base on testing 03/25/2024
+      "Microsoft.DBforPostgreSQL/flexibleServers/configurations/write",
       "Microsoft.Network/privateDnsZones/read",
       "Microsoft.Network/privateEndpoints/read",
       "Microsoft.Network/privateEndpoints/write",
