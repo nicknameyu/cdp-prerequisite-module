@@ -26,6 +26,12 @@ variable "cmk_rbac_data_actions" {
   default = [
       "Microsoft.KeyVault/vaults/keys/read", 
       "Microsoft.KeyVault/vaults/keys/wrap/action", 
-      "Microsoft.KeyVault/vaults/keys/unwrap/action"
+      "Microsoft.KeyVault/vaults/keys/unwrap/action",
+      "Microsoft.KeyVault/vaults/keys/update/action",
+      "Microsoft.KeyVault/vaults/keys/backup/action",
+      "Microsoft.KeyVault/vaults/keys/encrypt/action",
+      "Microsoft.KeyVault/vaults/keys/decrypt/action",
+      "Microsoft.KeyVault/vaults/keys/sign/action",
+      "Microsoft.KeyVault/vaults/keys/verify/action"
     ]
 }
