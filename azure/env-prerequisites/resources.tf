@@ -95,4 +95,11 @@ output "storage_account" {
     backup_container     = var.storage_locations.backups
   }
 }
+output "storage_locations" {
+  value = {
+    storage_location_base = "${var.storage_locations.data}@${azurerm_storage_account.cdp.primary_dfs_host}"
+    log_location          = "${var.storage_locations.logs}@${azurerm_storage_account.cdp.primary_dfs_host}"
+    backup_location       = "${var.storage_locations.backups}@${azurerm_storage_account.cdp.primary_dfs_host}"
+  }
+}
 

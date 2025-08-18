@@ -1,6 +1,6 @@
 # Cloudera Data Warehouse prerequisites
 
-This module is to create some role assignments for the Managed Identity in Data Services provisioning.
+This module is to create some role assignments for the Managed Identity in Data Services provisioning and CMK related provisionings.
 The reason for this role assignment is: 
 - Data services require a Managed Identity to manage the Postgres DB as well as the AKS. 
 - This Managed Identity needs the permission to conduct the PG DB or MySQL and AKS related operations. 

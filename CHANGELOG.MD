@@ -1,4 +1,6 @@
 # Change log for module cdp-prerequisite for Azure
+
+## v0.2.3 Azure adjustment final
 ## v0.2.2 Azure adjustment
 
 ## v0.2.1 azure adjustment

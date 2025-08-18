@@ -60,7 +60,7 @@ resource "azurerm_storage_account_customer_managed_key" "nfs" {
   key_name                  = var.cmk_resources.key_name
   user_assigned_identity_id = var.cmk_resources.managed_id
 }
-output "nfs-file-share" {
+output "nfs_file_share" {
   value = "nfs://${azurerm_storage_account.nfs.primary_file_host}:/${var.storage_account_name}/${azurerm_storage_share.nfs.name}"
 }
 
