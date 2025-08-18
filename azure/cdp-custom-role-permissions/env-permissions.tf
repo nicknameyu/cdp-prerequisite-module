@@ -74,6 +74,7 @@ variable "env_reduced_permission_actions" {
       "Microsoft.DBforPostgreSQL/flexibleServers/firewallRules/write",
       "Microsoft.DBforPostgreSQL/flexibleServers/start/action",                // added base on testing 03/25/2024
       "Microsoft.DBforPostgreSQL/flexibleServers/stop/action",                 // added base on testing 03/25/2024
+      "Microsoft.DBforPostgreSQL/flexibleServers/configurations/read",
       "Microsoft.DBforPostgreSQL/flexibleServers/configurations/write",
       "Microsoft.Network/privateDnsZones/read",
       "Microsoft.Network/privateEndpoints/read",
@@ -86,6 +87,9 @@ variable "env_reduced_permission_actions" {
       "Microsoft.DBforPostgreSQL/flexibleServers/privateEndpointConnections/read",              // Added base on testing 01/10/2025
       "Microsoft.DBforPostgreSQL/flexibleServers/privateEndpointConnections/delete",            // Added base on testing 01/10/2025
       "Microsoft.DBforPostgreSQL/flexibleServers/privateEndpointConnections/write",             // Added base on testing 01/10/2025
+      "Microsoft.DBforPostgreSQL/flexibleServers/databases/read",
+      "Microsoft.DBforPostgreSQL/flexibleServers/databases/write",
+      "Microsoft.DBforPostgreSQL/flexibleServers/databases/delete",
       "Microsoft.Network/privateDnsZones/A/read",
       "Microsoft.Network/privateDnsZones/A/write",
       "Microsoft.Network/privateDnsZones/A/delete",
