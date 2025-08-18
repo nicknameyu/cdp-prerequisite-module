@@ -2,8 +2,17 @@ resource "azurerm_role_assignment" "xaccount" {
   scope                = "/subscriptions/${var.subscription_id}"
   role_definition_name = var.custom_role_name == null ? "Contributor" : var.custom_role_name
   principal_id         = local.spn_object_id
-  depends_on = var.create_custom_role ? [ azurerm_role_definition.reduced[0] ]: []
+  depends_on           = [ time_sleep.custom_role ]
 }
+
+locals {
+  sleep_dependency = var.create_custom_role ? [ azurerm_role_definition.reduced[0] ]: []
+}
+resource "time_sleep" "custom_role" {
+  depends_on      = [local.sleep_dependency]
+  create_duration = var.create_custom_role ? "300s" : "1s"
+}
+
 
 module "custom_role_permissions" {
   source          = "github.com/nicknameyu/cdp-prerequisite-module/azure/cdp-custom-role-permissions"
