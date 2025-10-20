@@ -44,7 +44,7 @@
         ],
         "Resource": [
           "${STORAGE_LOCATION_BASE}",
-          "${STORAGE_LOCATION_BASE}/*"
+          "${STORAGE_LOCATION_BASE}*"
         ]
       }
     ]

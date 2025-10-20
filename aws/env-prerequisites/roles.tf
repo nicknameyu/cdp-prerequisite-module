@@ -1,24 +1,33 @@
-
 ############### IAM ROLES ###################
-# KMS policies
-# resource "aws_iam_policy" "kms_ro" {
-#   name        = "cdp-sse-kms-read-only-policy"
-#   path        = "/"
-#   description = "cdp-sse-kms-read-only-policy"
+resource "aws_iam_role" "idbroker" {
+  name                = var.role_names.idbroker
+  assume_role_policy  = file("${path.module}/policies/aws-cdp-ec2-role-trust-policy.json")
 
-#   policy = replace(file("./policies/aws-cdp-sse-kms-read-only-policy.json"), "$${KEY_ARN}", aws_kms_alias.cdp[0].arn)
-#   tags = var.tags
-# }
-resource "aws_iam_policy" "kms_rw" {
-  count       = var.cmk == null ? 0:1
-  name        = var.policy_names.sse-kms-read-write-policy
-  path        = "/"
-  description = "cdp-sse-kms-read-write-policy"
-
-  policy      = replace(file("${path.module}/policies/aws-cdp-sse-kms-read-write-policy.json"), "$${KEY_ARN}", var.cmk.create_key ? aws_kms_alias.cdp[0].arn : data.aws_kms_alias.cdp[0].arn)
-  tags        = var.tags
+  tags = var.tags
 }
-# IDBROKER role
+resource "aws_iam_role" "dl_admin" {
+  name                = var.role_names.datalake_admin
+  assume_role_policy  = replace(file("${path.module}/policies/aws-cdp-idbroker-role-trust-policy.json"), "$${IDBROKER_ROLE_ARN}", aws_iam_role.idbroker.arn)
+
+  tags = var.tags
+}
+
+resource "aws_iam_role" "log" {
+  name                = var.role_names.logger
+  assume_role_policy  = file("${path.module}/policies/aws-cdp-ec2-role-trust-policy.json")
+
+  tags = var.tags
+}
+resource "aws_iam_role" "ranger" {
+  name                = var.role_names.ranger
+  assume_role_policy  = replace(file("${path.module}/policies/aws-cdp-idbroker-role-trust-policy.json"), "$${IDBROKER_ROLE_ARN}", aws_iam_role.idbroker.arn)
+
+  tags = var.tags
+}
+
+## https://docs.cloudera.com/cdp-public-cloud/cloud/requirements-aws/topics/mc-iam-policy-definitions.html
+
+# IDBROKER role policies
 resource "aws_iam_policy" "assume" {
   name        = var.policy_names.idbroker-assume-role-policy
   path        = "/"
@@ -38,16 +47,15 @@ resource "aws_iam_policy" "log" {
     "${aws_s3_bucket.cdp.arn}/${aws_s3_object.folders[var.folders.logs].key}") 
   tags = var.tags
 }
-
-resource "aws_iam_role" "idbroker" {
-  name                = var.role_names.idbroker
-  assume_role_policy  = file("${path.module}/policies/aws-cdp-ec2-role-trust-policy.json")
-
-  tags = var.tags
+resource "aws_iam_role_policy_attachment" "idbroker" {
+  for_each = {
+                assume  = aws_iam_policy.assume.arn
+                log     = aws_iam_policy.log.arn
+              }
+  role = aws_iam_role.idbroker.name
+  policy_arn = each.value
 }
-
-
-# LOG ROLE
+# LOG ROLE policies
 resource "aws_iam_policy" "restore" {
   name        = var.policy_names.datalake-restore-policy
   path        = "/"
@@ -67,24 +75,17 @@ resource "aws_iam_policy" "cdp_backup" {
   tags        = var.tags
 }
 
-resource "aws_iam_role" "log" {
-  name                = var.role_names.logger
-  assume_role_policy  = file("${path.module}/policies/aws-cdp-ec2-role-trust-policy.json")
-
-  tags = var.tags
-}
 resource "aws_iam_role_policy_attachment" "log" {
-  for_each = merge({
-                    restore = aws_iam_policy.restore.arn
-                    log     = aws_iam_policy.log.arn
-                    backup  = aws_iam_policy.cdp_backup.arn
-                   },
-                   var.cmk == null ? {} : {kms = aws_iam_policy.kms_rw[0].arn}
-                   )
+  for_each = {
+                restore = aws_iam_policy.restore.arn
+                log     = aws_iam_policy.log.arn
+                backup  = aws_iam_policy.cdp_backup.arn
+                }
   role = aws_iam_role.log.name
   policy_arn = each.value
 }
-# RANGER_AUDIT_ROLE
+
+# RANGER_AUDIT_ROLE Policies
 resource "aws_iam_policy" "ranger" {
   name        = var.policy_names.ranger-audit-s3-policy
   path        = "/"
@@ -113,27 +114,18 @@ resource "aws_iam_policy" "dl_backup" {
   tags        = var.tags
 }
 
-resource "aws_iam_role" "ranger" {
-  name                = var.role_names.ranger
-  assume_role_policy  = replace(file("${path.module}/policies/aws-cdp-idbroker-role-trust-policy.json"), "$${IDBROKER_ROLE_ARN}", aws_iam_role.idbroker.arn)
-
-  tags = var.tags
-}
 resource "aws_iam_role_policy_attachment" "ranger" {
-  for_each = merge({
-                    restore    = aws_iam_policy.restore.arn 
-                    ranger     = aws_iam_policy.ranger.arn
-                    bkt_access = aws_iam_policy.ranger.arn
-                    dl_backup  = aws_iam_policy.dl_backup.arn
-
-                   },
-                    var.cmk == null ? {} : {kms = aws_iam_policy.kms_rw[0].arn}
-                  )
-
+  for_each = {
+                restore    = aws_iam_policy.restore.arn 
+                ranger     = aws_iam_policy.ranger.arn
+                bkt_access = aws_iam_policy.bkt_access.arn
+                dl_backup  = aws_iam_policy.dl_backup.arn
+              }
   role       = aws_iam_role.ranger.name
   policy_arn = each.value
 }
-# DATALAKE_ADMIN_ROLE
+
+# DATALAKE_ADMIN_ROLE policies
 resource "aws_iam_policy" "dl_admin" {
   name        = var.policy_names.datalake-admin-s3-policy
   path        = "/"
@@ -143,33 +135,19 @@ resource "aws_iam_policy" "dl_admin" {
                         "${aws_s3_bucket.cdp.arn}/${aws_s3_object.folders[var.folders.data].key}") 
   tags        = var.tags
 }
-resource "aws_iam_role" "dl_admin" {
-  name                = var.role_names.datalake_admin
-  assume_role_policy  = replace(file("${path.module}/policies/aws-cdp-idbroker-role-trust-policy.json"), "$${IDBROKER_ROLE_ARN}", aws_iam_role.idbroker.arn)
 
-  tags = var.tags
-}
 resource "aws_iam_role_policy_attachment" "dl_admin" {
-  for_each = merge({
-                        dl_admin   = aws_iam_policy.dl_admin.arn,
-                        bkt_access = aws_iam_policy.bkt_access.arn,
-                        dl_backup  = aws_iam_policy.dl_backup.arn,
-                        restore    = aws_iam_policy.restore.arn
-                   }, 
-                   var.cmk == null ? {} : {kms = aws_iam_policy.kms_rw[0].arn}
-                  )
+  for_each = {
+              dl_admin   = aws_iam_policy.dl_admin.arn,
+              bkt_access = aws_iam_policy.bkt_access.arn,
+              dl_backup  = aws_iam_policy.dl_backup.arn,
+              restore    = aws_iam_policy.restore.arn
+              }
   role = aws_iam_role.dl_admin.name
   policy_arn = each.value
 }
 
-output "roles" {
-  value = [
-      aws_iam_role.idbroker.name,
-      aws_iam_role.log.name,
-      aws_iam_role.dl_admin.name,
-      aws_iam_role.ranger.name
-    ]
-}
+
 
 ############# Instance Profiles #############
 resource "aws_iam_instance_profile" "data_access" {
@@ -185,4 +163,13 @@ resource "aws_iam_instance_profile" "log_access" {
 }
 output "instance_profiles" {
   value = [aws_iam_instance_profile.data_access.name, aws_iam_instance_profile.log_access.name]
+}
+
+output "cdp_role_names" {
+  value = {
+    idbroker   = aws_iam_role.idbroker.name
+    data_admin = aws_iam_role.dl_admin.name
+    logger     = aws_iam_role.log.name
+    ranger     = aws_iam_role.ranger.name
+  }
 }

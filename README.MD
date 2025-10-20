@@ -7,10 +7,13 @@ A terraform module to create Cloudera CDP Public Cloud prerequisite resources.
 ### Azure
 There are 5 modules in Azure directory. 
 - `service-principal` module is to create service principal for CDP to communicate with a user's Azure subscription. Some users have different IAM team to manage the service principal, custom roles, and role assignment. So this one has to be independent from others. 
+- `cdp-custom-role-permission` module generate the actions requred for custom roles to be used for CDP deployment. 
 - `env-prerequisites` module is to create environment fundation prerequisites including storage account, managed identities, as well as the role assignments between the managed identities and the resources.
-- `data-service-prerequisites` module creates a custom role and assign the custom role to the Datalake Admin managed identity. 
 - `cmk-prerequisites` module creates Azure Key Vault, key, as well as access policies for SPN, the managed identity for encyption, and the runner of this module. 
 - `nfs-prerequisites` module creates an NFS service on an Azure storage account, and encrypt it if necessary. 
+- `service-principal` module create Azure Service Principal and role assignment to SPN so that a CDP crednetial can be created on Cloudera UI.
+- `managed-identity-rbac` module create some role assignments for the Managed Identity in Data Services provisioning and CMK related provisionings.
+- `dns-zone-role-assignment` module create role assignments for Service Principal and managed identity to conduct required private DNS zone operations. This module is used only when the private DNS zones are in a subscription other than the CDP resource subscription. 
 
 ### AWS
 #### Variables

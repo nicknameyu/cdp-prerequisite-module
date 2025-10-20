@@ -1,5 +1,9 @@
 # Change log for module cdp-prerequisite for Azure
 
+## v0.2.4 AWS modules first version
+- AWS modules first version
+- a minor fix for Azure module
+
 ## v0.2.3 Azure adjustment final
 ## v0.2.2 Azure adjustment
 
