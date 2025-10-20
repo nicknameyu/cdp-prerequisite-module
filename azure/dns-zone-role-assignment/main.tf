@@ -23,6 +23,7 @@ data "azurerm_subscription" "current" {
 resource "azurerm_role_definition" "dns_zone" {
   count       = var.use_custom_role ? 1:0
   name        = var.custom_role_name
+  provider    = azurerm.dns_zone
   scope       = data.azurerm_subscription.current.id
   description = "CDP Cross subscription DNS Zone operator role"
   permissions {
@@ -35,6 +36,7 @@ resource "azurerm_role_definition" "dns_zone" {
 resource "azurerm_role_assignment" "dns_zone" {
   for_each             = var.principal_ids
   principal_id         = each.value
+  provider             = azurerm.dns_zone
   scope                = var.assign_scope == null ? data.azurerm_subscription.current.id : var.assign_scope
   role_definition_name = var.use_custom_role ? azurerm_role_definition.dns_zone[0].name : "Private DNS Zone Contributor"
 }

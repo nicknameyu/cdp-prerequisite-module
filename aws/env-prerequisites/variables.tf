@@ -1,10 +1,14 @@
-
 variable "region" {
   type = string
   default = "us-west-2"
 }
+variable "tags" {
+  type = map(string)
+  default = null
+}
 variable "cdp_bucket_name" {
   type = string
+  description = "The name of the S3 bucket for CDP environment storage."
 }
 variable "folders" {
   description = "The names of the folders in S3 buckets. Default to data, logs, and backups. "
@@ -19,62 +23,42 @@ variable "folders" {
     backups = "backups"
   }
 }
-
-variable "ssh_key" {
-  description = "The public key will be used to create an SSH public key in the AWS account. If not provided, the ssh key will not be created."
-  type = object({
-    name = string
-    key  = string
-  })
-  default = null
-}
-
-variable "cross_account_role" {
-  type = object({
-    name        = string
-    create_role = bool
-  })
-  description = "The name of the cross account role and whether it is an existing role or need to be created."
-}
-
-variable "aws_sso_user_arn_keyword" {
-  description = "This keyword is used to create trust relationship between the cross account role and the target user, so that the user can assume this role for operation activities, eg. log in the EKS cluster for troubleshooting. "
+variable "ssh_key_name" {
   type = string
-  default = "dqoYxNKsVt"
+  default = ""
+  description = "The public key will be used to create an SSH public key in the AWS account. If not provided, the ssh key will not be created."
 }
-
-variable "cmk" {
-  type    = object({
-    key_alias  = string
-    create_key = bool
-  })
+variable "ssh_key" {
+  description = "The public key will be used to create an SSH public key in the AWS account. This SSH key will be used to configure SSH access to CDP instances."
+  type = string
   default = null
-  description = "Whether to use KMS in the provisioning. If null, no CMK will be used. If create_key is true, a key will be created, and proper key policy will be attached to the key_alias. If create_key is false, proper key policy will be attached to the key with the key_alias."
-}
-variable "use_raz" {
-  default = null 
-  description = "Not yet supported"
-}
-variable "tags" {
-  type    = map(string)
-  default = null 
 }
 
-
-variable "role_names" {
-  description = "the names of the roles to be used in CDP provisioning."
+variable "instance_profile_names" {
+  description = "The name of the instance profiles to be used in CDP provisioning."
   type = object({
-    idbroker       = string
-    logger         = string
-    ranger         = string
-    datalake_admin = string
+    data_access = string
+    log_access  = string
   })
   default = {
-    idbroker       = "CDP_IDBROKER"
-    logger         = "CDP_LOG_ROLE"
-    ranger         = "CDP_RANGER_AUDIT"
-    datalake_admin = "CDP_DATALAKE_ADMIN"
+    data_access = "cdp-data-access-instance-profile"
+    log_access  = "cdp-log-access-instance-profile"
   }
+}
+variable "role_names" {
+  type = object({
+    idbroker       = string
+    datalake_admin = string
+    logger         = string
+    ranger         = string
+  })
+  default = {
+    idbroker       = "cdp-idbroker-role"
+    datalake_admin = "cdp-datalake-admin-role"
+    logger         = "cdp-logger-role"
+    ranger         = "cdp-ranger-role"
+  }
+  description = "Names of the required CDP roles."
 }
 
 variable "policy_names" {
@@ -106,17 +90,5 @@ variable "policy_names" {
     bucket-access-policy        = "cdp-bucket-access-policy"
     datalake-backup-policy      = "cdp-datalake-backup-policy"
     datalake-admin-s3-policy    = "cdp-datalake-admin-s3-policy"
-  }
-}
-
-variable "instance_profile_names" {
-  description = "The name of the instance profiles to be used in CDP provisioning."
-  type = object({
-    data_access = string
-    log_access  = string
-  })
-  default = {
-    data_access = "cdp-data-access-instance-profile"
-    log_access  = "cdp-log-access-instance-profile"
   }
 }
