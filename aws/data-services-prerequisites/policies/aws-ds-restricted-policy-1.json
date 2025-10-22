@@ -210,7 +210,20 @@
                 "iam:ListRoleTags",
                 "iam:RemoveRoleFromInstanceProfile",
                 "iam:TagRole",
-                "iam:UntagRole"
+                "iam:AddRoleToInstanceProfile",
+                "iam:AttachRolePolicy",
+                "iam:CreateRole",
+                "iam:CreateServiceLinkedRole",
+                "iam:DeleteRole",
+                "iam:DeleteRolePolicy",
+                "iam:DetachRolePolicy",
+                "iam:GetRole",
+                "iam:ListAttachedRolePolicies",
+                "iam:ListRolePolicies",
+                "iam:ListRoles",
+                "iam:PassRole",
+                "iam:PutRolePolicy",
+                "iam:SimulatePrincipalPolicy"
             ],
             "Resource": [
                 "*"
@@ -245,7 +258,12 @@
                 "elasticloadbalancing:DescribeLoadBalancers",
                 "iam:GetRole",
                 "iam:ListRoles",
-                "iam:GetInstanceProfile"
+                "iam:GetInstanceProfile",
+                "iam:CreateInstanceProfile",
+                "iam:DeleteInstanceProfile",
+                "iam:ListInstanceProfiles",
+                "iam:RemoveRoleFromInstanceProfile",
+                "iam:AddRoleToInstanceProfile"
             ],
             "Resource": [
                 "*"
