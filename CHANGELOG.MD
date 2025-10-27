@@ -1,5 +1,13 @@
 # Change log for module cdp-prerequisite for Azure
 
+## v0.2.6 AWS policy adjustment
+- update cross account reduced policy with the latest version. 
+- update reduced policy for DW with the latest version. plus three undocumented permissions:
+```
+        "acm:RequestCertificate",
+        "acm:AddTagsToCertificate",
+        "elasticfilesystem:PutFileSystemPolicy",
+```
 ## v0.2.5 AWS policy adjustment
 - Liftie policy wasn't sufficient. Adding below policies base on testing. These policies are missing in Liftie policy V9, V10, V12.
 ```

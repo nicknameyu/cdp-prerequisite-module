@@ -130,6 +130,9 @@
             "Action": [
                 "acm:DescribeCertificate",
                 "acm:ListCertificates",
+                "acm:RequestCertificate",
+                "acm:AddTagsToCertificate",
+                "elasticfilesystem:PutFileSystemPolicy",
                 "autoscaling:DescribeAutoScalingGroups",
                 "ec2:CreateKeyPair",
                 "ec2:CreateTags",
@@ -140,6 +143,7 @@
                 "ec2:DescribeSubNets",
                 "ec2:DescribeVpcAttribute",
                 "ec2:DescribeVpcs",
+                "ec2:DescribeInstanceTypes",
                 "iam:ListAttachedRolePolicies",
                 "iam:SimulatePrincipalPolicy",
                 "s3:GetBucketLocation",
@@ -147,6 +151,19 @@
                 "s3:PutObjectAcl"
             ],
             "Resource": "*"
+        },
+        {
+            "Sid": "StartStopRDS",
+            "Effect": "Allow",
+            "Action": [
+                "rds:StartDBInstance",
+                "rds:StopDBInstance",
+                "rds:DescribeDBInstances"
+            ],
+            "Resource": [
+                "arn:aws:rds:*:*:db:env-*-dwx-stack-rds",
+                "arn:aws:rds:*:*:subgrp:env-*-dwx-stack-dbsubnetgroup-*"
+            ]
         }
     ]
 }
