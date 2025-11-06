@@ -32,7 +32,7 @@ output "kms_key_arn" {
 
 ## S3 bucket encryption.
 resource "aws_s3_bucket_server_side_encryption_configuration" "sse" {
-  count = var.s3_bucket_id == null ? 1:0
+  count = var.s3_bucket_id == null ? 0:1
   bucket = var.s3_bucket_id
   rule {
     apply_server_side_encryption_by_default {

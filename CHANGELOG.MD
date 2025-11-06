@@ -1,5 +1,5 @@
 # Change log for module cdp-prerequisite for Azure
-
+## v0.2.6-1 AWS module bug fix
 ## v0.2.6 AWS policy adjustment
 - update cross account reduced policy with the latest version. 
 - update reduced policy for DW with the latest version. plus three undocumented permissions:
