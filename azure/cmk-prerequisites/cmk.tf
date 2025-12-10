@@ -7,7 +7,7 @@ data "azurerm_key_vault" "kv" {
   resource_group_name = var.resource_group_name
   lifecycle {
     postcondition {
-      condition     = ! self.enable_rbac_authorization 
+      condition     = ! self.rbac_authorization_enabled 
       error_message = "Key Vault must be configured with Access Policy for authorization."
     }
   }
@@ -16,7 +16,7 @@ resource "azurerm_key_vault" "kv" {
   count                      = var.create_keyvault ? 1:0
   name                       = var.key_vault_name
   location                   = var.location
-  enable_rbac_authorization  = ! var.enable_access_policy
+  rbac_authorization_enabled = ! var.enable_access_policy
   resource_group_name        = var.resource_group_name
   tenant_id                  = data.azurerm_subscription.current.tenant_id
   sku_name                   = "premium"

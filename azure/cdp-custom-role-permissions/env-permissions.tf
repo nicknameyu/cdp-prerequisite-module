@@ -105,7 +105,6 @@ variable "env_reduced_permission_actions" {
       "Microsoft.Network/loadBalancers/write",
       "Microsoft.Network/loadBalancers/backendAddressPools/join/action",
       "Microsoft.Resources/deployments/cancel/action",
-      "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/write",            // Added 9/10/2024 with testing for DE service
       "Microsoft.MarketplaceOrdering/offertypes/publishers/offers/plans/agreements/read",
       "Microsoft.MarketplaceOrdering/offertypes/publishers/offers/plans/agreements/write" 
     ]

@@ -7,7 +7,7 @@ variable "liftie_actions" {
       "Microsoft.ContainerService/managedClusters/agentPools/read",
       "Microsoft.ContainerService/managedClusters/agentPools/write",
       "Microsoft.ContainerService/managedClusters/upgradeProfiles/read",
-	  "Microsoft.ContainerService/managedClusters/agentPools/delete",
+	    "Microsoft.ContainerService/managedClusters/agentPools/delete",
       "Microsoft.ContainerService/managedClusters/delete",
       "Microsoft.ContainerService/managedClusters/accessProfiles/listCredential/action",
       "Microsoft.ContainerService/managedClusters/agentPools/upgradeProfiles/read",
@@ -37,7 +37,8 @@ variable "liftie_actions" {
       "Microsoft.Network/privateEndpoints/privateDnsZoneGroups/read",
       "Microsoft.Network/privateEndpoints/privateDnsZoneGroups/write",
       "Microsoft.Network/privateEndpoints/privateDnsZoneGroups/delete",
-      "Microsoft.Network/privateDnsZones/join/action"
+      "Microsoft.Network/privateDnsZones/join/action",
+      "Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/*",           # added base on doc update on 12/03/2025
     ]
 }
 variable "enable_liftie" {

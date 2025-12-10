@@ -46,7 +46,7 @@ variable "spn_object_id" {
   description = "The SPN object ID to be granted the access policy."
   default = null
   validation {
-    condition     = var.enable_access_policy == false || (var.enable_access_policy == true && var.spn_object_id != null && length(trim(var.spn_object_id)) > 0)
+    condition     = var.enable_access_policy == false || (var.enable_access_policy == true && var.spn_object_id != null && length(var.spn_object_id) > 0)
     error_message = "spn_object_id cannot be null or empty when enable_access_policy is true."
   }
 }
