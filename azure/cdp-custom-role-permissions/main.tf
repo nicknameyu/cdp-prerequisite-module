@@ -31,16 +31,6 @@ output "mi_permissions" {
     scope        = "CDP Subscription"
   }
 }
-# output "spn_buildin_role" {
-#   value = concat( 
-#       var.enable_cmk_rbac ? [{ role_name = "Key Vault Crypto User", scope = "CDP Subscription" }] : [] ,
-#       var.enable_dns_zone_subscription ?  [{role_name = "Private DNS Zone Contributor", scope = "Private DNS Zone Subscription" }]: [])
-# }
-# output "mi_buildin_role" {
-#   value = concat( 
-#       var.enable_cmk_rbac ? [{ role_name = "Key Vault Crypto User", scope = "CDP Subscription" }] : [] ,
-#       var.enable_dns_zone_subscription ?  [{role_name = "Private DNS Zone Contributor", scope = "Private DNS Zone Subscription" }]: [])
-# }
 output "dns_zone_permissions" {
   value       = var.dns_zone_actions
 }

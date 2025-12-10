@@ -1,4 +1,9 @@
 # Change log for module cdp-prerequisite for Azure
+## v0.2.7 Azure permission module change base on doc update.
+- remove  `"Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/write"` for environment.
+- Add `"Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/*"` permission for Liftie. 
+- Fix a bug.
+
 ## v0.2.6-1 AWS module bug fix
 ## v0.2.6 AWS policy adjustment
 - update cross account reduced policy with the latest version. 
