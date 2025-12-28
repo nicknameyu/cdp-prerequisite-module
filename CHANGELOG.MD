@@ -1,4 +1,7 @@
 # Change log for module cdp-prerequisite for Azure
+## v0.2.8 Azure module
+- RBAC for current caller to the new created KeyVault. If not granted, the key cannot be created due to insufficient permissions.
+- Add a `test` folder to custom-role-permission module, cause it will be frequently used.
 ## v0.2.7 Azure permission module change base on doc update.
 - remove  `"Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/write"` for environment.
 - Add `"Microsoft.ManagedIdentity/userAssignedIdentities/federatedIdentityCredentials/*"` permission for Liftie. 

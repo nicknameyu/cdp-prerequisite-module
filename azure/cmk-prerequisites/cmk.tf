@@ -29,6 +29,15 @@ locals {
   key_vault_id    = var.create_keyvault ? azurerm_key_vault.kv[0].id : data.azurerm_key_vault.kv[0].id
 }
 
+### RBAC for current caller to the new created KeyVault. If not granted, the key cannot be created due to insufficient permissions.
+### The role assignment only applies to new created Key Vault. If the Key Vault is not created by this module, the module assumes that
+### the permission to create keys has already been granted to the caller.
+resource "azurerm_role_assignment" "caller" {
+  count                = var.create_keyvault ? 1:0
+  principal_id         = data.azurerm_client_config.current.object_id
+  role_definition_name = "Key Vault Crypto Officer"
+  scope                = azurerm_key_vault.kv[0].id
+}
 ### Create CMK
 resource "azurerm_key_vault_key" "default" {
   name         = var.key_name
@@ -53,7 +62,7 @@ resource "azurerm_key_vault_key" "default" {
     expire_after         = "P90D"
     notify_before_expiry = "P29D"
   }
-  depends_on = [ azurerm_key_vault_access_policy.kv ]
+  depends_on = [azurerm_role_assignment.caller, azurerm_key_vault_access_policy.kv]
 }
 
 output "cmk_key_id" {
