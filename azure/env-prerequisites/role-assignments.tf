@@ -41,6 +41,11 @@ locals {
         scope = azurerm_storage_container.containers["backups"].id
         role  = "Storage Blob Data Contributor"     //Storage Blob Data Contributor role
       },
+      logger3 = {                                   //Added for CAI Model registry. 
+        principal_id = azurerm_user_assigned_identity.managed_id["logger"].principal_id
+        scope = azurerm_storage_account.cdp.id
+        role  = "Storage Account Contributor"
+      },
       ranger1 = {
         principal_id = azurerm_user_assigned_identity.managed_id["ranger"].principal_id
         scope = azurerm_storage_container.containers["data"].id
