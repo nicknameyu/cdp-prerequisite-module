@@ -1,4 +1,12 @@
 # Change log for module cdp-prerequisite for Azure
+## v0.2.9 Azure and AWS
+Azure: 
+- Add `Storage Account Contributor` permission to logger MI per recently introduced by CAI requirement.
+AWS:
+- Update Liftie policy to V12
+- Update DE policy to latest version.
+- Fix bug in Liftie CMK policy
+
 ## v0.2.8 Azure module
 - RBAC for current caller to the new created KeyVault. If not granted, the key cannot be created due to insufficient permissions.
 - Add a `test` folder to custom-role-permission module, cause it will be frequently used.

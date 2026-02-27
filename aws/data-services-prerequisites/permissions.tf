@@ -16,11 +16,12 @@ locals {
       description  = "${upper(var.policy_prefix)} reduced policy for Data Engineering part 1"
       policy       = file("${path.module}/policies/aws-de-restricted-policy-part1.json")
     }
-    de2       = {
-      name         = "${var.policy_prefix}-de-reduced-policy-2"
-      description  = "${upper(var.policy_prefix)} reduced policy for Data Engineering part 2"
-      policy       = file("${path.module}/policies/aws-de-restricted-policy-part2.json")
-    }
+  # DE policy can now be put into one policy file. removing de2.
+    # de2       = {
+    #   name         = "${var.policy_prefix}-de-reduced-policy-2"
+    #   description  = "${upper(var.policy_prefix)} reduced policy for Data Engineering part 2"
+    #   policy       = file("${path.module}/policies/aws-de-restricted-policy-part2.json")
+    # }
   }
 
   liftie_policies = {
@@ -40,9 +41,10 @@ locals {
     liftie_cmk = {
       name         = "${var.policy_prefix}-liftie-cmk-reduced-policy"
       description  = "${upper(var.policy_prefix)} reduced policy for Liftie with CMK"
-      policy       = replace(replace(file("${path.module}/policies/aws-liftie-cmk-reduced-policy.json"),
+      policy       = replace(replace(replace(file("${path.module}/policies/aws-liftie-cmk-reduced-policy.json"),
                                "$${YOUR-ACCOUNT-ID}", data.aws_caller_identity.current.account_id),
-                        "$${CDP-CROSSACCOUNT-ROLE}", var.xaccount_role_name)
+                            "$${CDP-CROSSACCOUNT-ROLE}", var.xaccount_role_name),
+                        "$${YOUR-ACCOUNT-REGION}", var.region)
     }
   }
   dw_policy  = {

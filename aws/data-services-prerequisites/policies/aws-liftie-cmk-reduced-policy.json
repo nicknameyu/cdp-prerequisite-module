@@ -71,7 +71,7 @@
                 "StringEquals":
                 {
                     "kms:CallerAccount": "${YOUR-ACCOUNT-ID}",
-                    "kms:viaService": "ec2.[YOUR-ACCOUNT-REGION].amazonaws.com"
+                    "kms:viaService": "ec2.${YOUR-ACCOUNT-REGION}.amazonaws.com"
                 }
             }
         }
