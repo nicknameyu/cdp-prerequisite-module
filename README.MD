@@ -2,6 +2,8 @@
 
 A terraform module to create Cloudera CDP Public Cloud prerequisite resources. 
 
+In Cloudera document, the term `prerequisits` is defined as a Cloud managed object storage as well as a few principals and associated permissions for CDP to store and access data. However, in a standard CDP onboarding, the prerequisites are actually more complicated, especially when using CMK or reduced permission. This the objective of this repo is to try building a number of modules that can cover most of the configurations required for a CDP onboarding on the public Cloud.
+
 ## Usuage:
 
 ### Azure
@@ -16,6 +18,12 @@ There are 5 modules in Azure directory.
 - `dns-zone-role-assignment` module create role assignments for Service Principal and managed identity to conduct required private DNS zone operations. This module is used only when the private DNS zones are in a subscription other than the CDP resource subscription. 
 
 ### AWS
+There are 5 modules in AWS directory.
+- `xaccount-role` module is to create or configure a cross account role for Cloudera control plane to create resources in the customer's tenant.
+- `env-prerequisistes` module is to create Cloudera `prerequisites` resources for CDP deployment, which includes an S3 bucket, 4 custom roles, and an SSH key pair. 
+- `cmk-prerequisites` module is to create a customer managed key in the AWS KMS service for CMK configuration as well as configuring the IAM policies for IAM roles to access the CMK.
+- `data-services-prerequisites` module is to configure permissions for the cross account role to create Cloduera Data Service required resources in the customer's AWS tenant when reduced permission is seletected in the implementation. 
+
 #### Variables
 - region: Optional. AWS region to deploy the resources. Default to `us-west-2`
 - cdp_bucket_name: Mandatory. AWS bucket name. 
