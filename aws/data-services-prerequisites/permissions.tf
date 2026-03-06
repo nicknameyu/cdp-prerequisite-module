@@ -75,6 +75,11 @@ locals {
                                   "$${YOUR-ACCOUNT-ID}", data.aws_caller_identity.current.account_id),
                             "$${YOUR-IAM-ROLE-NAME}",
                             var.xaccount_role_name)
+    },
+    ml_backup     = {
+      name        = "${var.policy_prefix}-ml-backup-restore-policy"
+      description = "${upper(var.policy_prefix)} backup and restore policy for Machine Learning"
+      policy      = file("${path.module}/policies/aws-ml-backup-restore-policy.json")
     }
   }
   enable_liftie = var.enable_ai || var.enable_de || var.enable_df   # liftie is required for CAI, CDE, CDF.
