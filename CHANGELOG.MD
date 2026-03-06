@@ -1,7 +1,12 @@
 # Change log for module cdp-prerequisite for Azure
+
+## v0.2.10 AWS 
+- Added CAI backup/restore policy https://docs.cloudera.com/machine-learning/cloud/workspaces/topics/ml-backup-restore-prerequisites.html
+
 ## v0.2.9 Azure and AWS
 Azure: 
 - Add `Storage Account Contributor` permission to logger MI per recently introduced by CAI requirement.
+
 AWS:
 - Update Liftie policy to V12
 - Update DE policy to latest version.
