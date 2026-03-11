@@ -1,5 +1,14 @@
 data "aws_caller_identity" "current" {}
 
+## CML Backup and restore policies
+data "http" "ml_backup_policy" {
+  url = "https://docs.cloudera.com/machine-learning/cloud/cml-backup-policy.json"
+}
+data "http" "ml_restore_policy" {
+  url = "https://docs.cloudera.com/machine-learning/cloud/cml-restore-policy.json"
+}
+
+
 locals {
   liftie_policy_raw = file("${path.module}/policies/aws-ds-restricted-policy-1.json")
   liftie_policy_1   = replace(local.liftie_policy_raw, "$${YOUR-ACCOUNT-ID}", data.aws_caller_identity.current.account_id)
@@ -77,9 +86,14 @@ locals {
                             var.xaccount_role_name)
     },
     ml_backup     = {
-      name        = "${var.policy_prefix}-ml-backup-restore-policy"
-      description = "${upper(var.policy_prefix)} backup and restore policy for Machine Learning"
-      policy      = file("${path.module}/policies/aws-ml-backup-restore-policy.json")
+      name        = "${var.policy_prefix}-ml-backup-policy"
+      description = "${upper(var.policy_prefix)} backup policy for Machine Learning"
+      policy      = data.http.ml_backup_policy.response_body
+    },
+    ml_restore    = {
+      name        = "${var.policy_prefix}-ml-restore-policy"
+      description = "${upper(var.policy_prefix)} restore policy for Machine Learning"
+      policy      = data.http.ml_restore_policy.response_body
     }
   }
   enable_liftie = var.enable_ai || var.enable_de || var.enable_df   # liftie is required for CAI, CDE, CDF.
