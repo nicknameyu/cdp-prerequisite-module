@@ -1,5 +1,8 @@
 # Change log for module cdp-prerequisite for Azure
 
+## v0.2.11 aws ml policy update
+- close #10
+
 ## v0.2.10 AWS 
 - Added CAI backup/restore policy https://docs.cloudera.com/machine-learning/cloud/workspaces/topics/ml-backup-restore-prerequisites.html
 
