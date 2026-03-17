@@ -119,6 +119,7 @@
           "ec2:DescribeAccountAttributes",
           "ec2:DisassociateAddress",
           "ec2:DescribeNetworkInterfaces",
+          "ec2:CreateTags",
           "sts:DecodeAuthorizationMessage",
           "cloudformation:DescribeStacks",
           "iam:ListInstanceProfiles",
@@ -150,6 +151,8 @@
           "iam:GetInstanceProfile",
           "iam:SimulatePrincipalPolicy",
           "iam:GetRole",
+          "iam:TagRole",
+          "iam:UntagRole",
           "rds:AddTagsToResource",
           "rds:CreateDBInstance",
           "rds:CreateDBSubnetGroup",
@@ -183,6 +186,22 @@
           "iam:PassRole"
         ],
         "Resource": "*"
+      },
+      {
+        "Sid": "IdentityAccessManagementLiftie",
+        "Effect": "Allow",
+        "Action": [
+          "iam:GetRolePolicy",
+          "iam:PutRolePolicy",
+          "iam:CreateInstanceProfile",
+          "iam:DeleteInstanceProfile",
+          "iam:AddRoleToInstanceProfile",
+          "iam:RemoveRoleFromInstanceProfile"
+        ],
+        "Resource": [
+          "arn:aws:iam::*:role/liftie-*",
+          "arn:aws:iam::*:instance-profile/liftie-*"
+        ]
       },
       {
         "Sid": "IdentityAccessManagementLimited",
