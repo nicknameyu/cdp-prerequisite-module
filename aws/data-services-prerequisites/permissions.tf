@@ -10,6 +10,8 @@ data "http" "ml_restore_policy" {
 
 
 locals {
+  // Liftie policy doesn't have a online json file. Have to use a local file. Content from 
+  // https://docs.cloudera.com/machine-learning/cloud/requirements-aws/topics/ml-aws-restricted-create-roles-policies-2.html
   liftie_policy_raw = file("${path.module}/policies/aws-ds-restricted-policy-1.json")
   liftie_policy_1   = replace(local.liftie_policy_raw, "$${YOUR-ACCOUNT-ID}", data.aws_caller_identity.current.account_id)
   liftie_policy_2   = replace(local.liftie_policy_1, "$${YOUR-IAM-ROLE-NAME}", var.xaccount_role_name)
@@ -32,7 +34,8 @@ locals {
     #   policy       = file("${path.module}/policies/aws-de-restricted-policy-part2.json")
     # }
   }
-
+  // Liftie CMK policy doesn't have a online JSON file, have to use a local file.
+  // https://docs.cloudera.com/machine-learning/cloud/requirements-aws/topics/ml-aws-restricted-create-roles-policies-2.html
   liftie_policies = {
      # Liftie policy cannot be put into one policy file. Using two policy file for Liftie permissions.
     liftie1 = {
