@@ -1,5 +1,9 @@
 # Change log for module cdp-prerequisite for Azure
 
+## v0.2.11-1 non-feature update
+- remove the test folder under `aws` and `azure` directories.
+- A couple of comment update.
+
 ## v0.2.11 aws ml policy update
 - close #10
 

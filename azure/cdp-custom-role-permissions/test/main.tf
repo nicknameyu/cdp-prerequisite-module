@@ -3,7 +3,7 @@ module "custom_role_permissions" {
   enable_cmk      = true
   enable_dw       = false
   enable_liftie   = true
-  enable_de       = false
+  enable_de       = true
 }
 
 output "spn_permissions" {
