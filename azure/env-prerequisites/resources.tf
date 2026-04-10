@@ -42,6 +42,14 @@ resource "azurerm_storage_container" "containers" {
   container_access_type = "private"
 }
 
+resource "azurerm_storage_data_lake_gen2_path" "modelregistry" {
+  count              = var.enable_ai ? 1:0
+  path               = "modelregistry"
+  filesystem_name    = azurerm_storage_container.containers["data"].name
+  storage_account_id = azurerm_storage_account.cdp.id
+  resource           = "directory"
+}
+
 output "storage" {
   value = {
     storage-location = "${var.storage_locations.data}@${azurerm_storage_account.cdp.primary_dfs_host}"

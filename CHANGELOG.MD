@@ -1,5 +1,9 @@
 # Change log for module cdp-prerequisite for Azure
 
+## v0.2.12 Consolidated update
+
+- issue #28 permission adjustment for logger MI for CAI
+
 ## v0.2.11-2 non-feature update
 - update readmes
 

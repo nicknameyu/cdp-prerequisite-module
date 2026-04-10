@@ -65,3 +65,16 @@ variable "raz_mi_name" {
   type        = string
   default     = null
 }
+
+variable "enable_ai" {
+/*
+This is introduced in Feb 2026
+If you are using Cloudera AI, you must also assign the following roles to the Logger managed identity for the data lake storage account:
+Storage Account Contributor
+Storage Blob Data Contributor for the container: [data], prefix: [modelregistry] (for example: /modelregistry).
+For more information about permissions for Cloudera AI on Azure, see Cloudera AI minimum permissions.
+*/
+  type        = bool
+  default     = true
+  description = "Enable CAI permission setting. "
+}
