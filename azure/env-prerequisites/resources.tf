@@ -20,11 +20,15 @@ resource "azurerm_storage_account" "cdp" {
   account_replication_type = var.obj_storage_performance.replication
   account_kind             = "StorageV2"
   is_hns_enabled           = true
-  identity {
-    // This part is to prepare the possibility that an environment may need CMK to encrypt the storage account. 
-    type = "SystemAssigned, UserAssigned"
-    identity_ids = [ azurerm_user_assigned_identity.managed_id["dataaccess"].id]
+
+  dynamic "identity" {
+    for_each = var.cmk_ds_mi_name != null ? [1] : []
+    content {
+      type         = "UserAssigned"
+      identity_ids = [azurerm_user_assigned_identity.cmk[0].id]
+    }
   }
+
 
   tags = var.tags
   lifecycle {
@@ -74,6 +78,14 @@ resource "azurerm_user_assigned_identity" "raz" {
 
   tags = var.tags
 }
+resource "azurerm_user_assigned_identity" "cmk" {
+  count               = var.cmk_ds_mi_name == null ? 0:1
+  location            = var.location
+  name                = var.cmk_ds_mi_name
+  resource_group_name = local.resource_group_name
+
+  tags = var.tags
+}
 
 output "mi_ids" {
   value = {
@@ -82,6 +94,7 @@ output "mi_ids" {
     logger     = azurerm_user_assigned_identity.managed_id["logger"].id
     ranger     = azurerm_user_assigned_identity.managed_id["ranger"].id
     raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].id
+    cmk_ds     = var.cmk_ds_mi_name == null ? null : azurerm_user_assigned_identity.cmk[0].id
   }
 }
 output "mi_principal_ids" {
@@ -91,6 +104,7 @@ output "mi_principal_ids" {
     logger     = azurerm_user_assigned_identity.managed_id["logger"].principal_id
     ranger     = azurerm_user_assigned_identity.managed_id["ranger"].principal_id
     raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].principal_id
+    cmk        = var.cmk_ds_mi_name == null ? null : azurerm_user_assigned_identity.cmk[0].principal_id
   }
 }
 output "storage_account" {

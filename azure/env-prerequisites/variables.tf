@@ -65,6 +65,11 @@ variable "raz_mi_name" {
   type        = string
   default     = null
 }
+variable "cmk_ds_mi_name" {
+  description = "Managed identity name for CMK, AKS admin."
+  type        = string
+  default     = null
+}
 
 variable "enable_ai" {
 /*
