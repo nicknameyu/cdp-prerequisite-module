@@ -83,3 +83,14 @@ For more information about permissions for Cloudera AI on Azure, see Cloudera AI
   default     = true
   description = "Enable CAI permission setting. "
 }
+
+variable "subnet_ids" {
+  type = list(string)
+  default = []
+  description = "Get the list of subnet IDs need to be added to the list to access the storage account. If empty, open access to every network."
+}
+variable "storage_ip_rules" {
+  type = list(string)
+  default = []
+  description = "Get the list of ip addresses to be added to the list to access the storage account."
+}

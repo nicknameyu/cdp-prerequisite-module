@@ -12,6 +12,9 @@ locals{
   resource_group_name = var.create_resource_group ? azurerm_resource_group.prerequisite[0].name : data.azurerm_resource_group.prerequisite[0].name
 }
 ############# Storage ############
+data "http" "myip" {
+  url = "http://ipv4.icanhazip.com"
+}
 resource "azurerm_storage_account" "cdp" {
   name                     = var.storage_account_name
   resource_group_name      = local.resource_group_name
@@ -29,6 +32,11 @@ resource "azurerm_storage_account" "cdp" {
     }
   }
 
+  network_rules {
+    default_action             =  (length(var.storage_ip_rules) > 0 || length(var.subnet_ids) > 0) ? "Deny" : "Allow"
+    ip_rules                   = distinct(concat(var.storage_ip_rules, [chomp(data.http.myip.response_body)] ))
+    virtual_network_subnet_ids = var.subnet_ids
+  }
 
   tags = var.tags
   lifecycle {
