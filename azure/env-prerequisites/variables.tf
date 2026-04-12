@@ -65,3 +65,32 @@ variable "raz_mi_name" {
   type        = string
   default     = null
 }
+variable "cmk_ds_mi_name" {
+  description = "Managed identity name for CMK, AKS admin."
+  type        = string
+  default     = null
+}
+
+variable "enable_ai" {
+/*
+This is introduced in Feb 2026
+If you are using Cloudera AI, you must also assign the following roles to the Logger managed identity for the data lake storage account:
+Storage Account Contributor
+Storage Blob Data Contributor for the container: [data], prefix: [modelregistry] (for example: /modelregistry).
+For more information about permissions for Cloudera AI on Azure, see Cloudera AI minimum permissions.
+*/
+  type        = bool
+  default     = true
+  description = "Enable CAI permission setting. "
+}
+
+variable "subnet_ids" {
+  type = list(string)
+  default = []
+  description = "Get the list of subnet IDs need to be added to the list to access the storage account. If empty, open access to every network."
+}
+variable "storage_ip_rules" {
+  type = list(string)
+  default = []
+  description = "Get the list of ip addresses to be added to the list to access the storage account."
+}

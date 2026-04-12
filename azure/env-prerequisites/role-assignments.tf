@@ -41,11 +41,6 @@ locals {
         scope = azurerm_storage_container.containers["backups"].id
         role  = "Storage Blob Data Contributor"     //Storage Blob Data Contributor role
       },
-      logger3 = {                                   //Added for CAI Model registry. 
-        principal_id = azurerm_user_assigned_identity.managed_id["logger"].principal_id
-        scope = azurerm_storage_account.cdp.id
-        role  = "Storage Account Contributor"
-      },
       ranger1 = {
         principal_id = azurerm_user_assigned_identity.managed_id["ranger"].principal_id
         scope = azurerm_storage_container.containers["data"].id
@@ -61,10 +56,27 @@ locals {
         scope = azurerm_storage_container.containers["backups"].id
         role  = "Storage Blob Data Contributor"     //Storage Blob Data Contributor role
       },
-
+  }
+  // issue #28, CAI registry permission update
+  cai_assignments = !var.enable_ai ? {} : {
+    logger1 = {
+      principal_id = azurerm_user_assigned_identity.managed_id["logger"].principal_id
+      scope = azurerm_storage_account.cdp.id
+      role  = "Storage Account Contributor"
+    },
+    logger2 = {
+      principal_id = azurerm_user_assigned_identity.managed_id["logger"].principal_id
+      scope = azurerm_storage_container.containers["data"].id
+      role  = "Storage Blob Data Contributor"
+    }
   }
 }
-
+resource "azurerm_role_assignment" "cai" {
+  for_each             = local.cai_assignments
+  scope                = each.value["scope"]
+  role_definition_name = each.value["role"]
+  principal_id         = each.value["principal_id"]
+}
 resource "azurerm_role_assignment" "assignment" {
   for_each             = local.role_assignment
   scope                = each.value["scope"]

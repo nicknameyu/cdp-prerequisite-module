@@ -12,6 +12,9 @@ locals{
   resource_group_name = var.create_resource_group ? azurerm_resource_group.prerequisite[0].name : data.azurerm_resource_group.prerequisite[0].name
 }
 ############# Storage ############
+data "http" "myip" {
+  url = "http://ipv4.icanhazip.com"
+}
 resource "azurerm_storage_account" "cdp" {
   name                     = var.storage_account_name
   resource_group_name      = local.resource_group_name
@@ -20,10 +23,19 @@ resource "azurerm_storage_account" "cdp" {
   account_replication_type = var.obj_storage_performance.replication
   account_kind             = "StorageV2"
   is_hns_enabled           = true
-  identity {
-    // This part is to prepare the possibility that an environment may need CMK to encrypt the storage account. 
-    type = "SystemAssigned, UserAssigned"
-    identity_ids = [ azurerm_user_assigned_identity.managed_id["dataaccess"].id]
+
+  dynamic "identity" {
+    for_each = var.cmk_ds_mi_name != null ? [1] : []
+    content {
+      type         = "UserAssigned"
+      identity_ids = [azurerm_user_assigned_identity.cmk[0].id]
+    }
+  }
+
+  network_rules {
+    default_action             =  (length(var.storage_ip_rules) > 0 || length(var.subnet_ids) > 0) ? "Deny" : "Allow"
+    ip_rules                   = distinct(concat(var.storage_ip_rules, [chomp(data.http.myip.response_body)] ))
+    virtual_network_subnet_ids = var.subnet_ids
   }
 
   tags = var.tags
@@ -40,6 +52,14 @@ resource "azurerm_storage_container" "containers" {
   name                  = each.value
   storage_account_id    = azurerm_storage_account.cdp.id
   container_access_type = "private"
+}
+
+resource "azurerm_storage_data_lake_gen2_path" "modelregistry" {
+  count              = var.enable_ai ? 1:0
+  path               = "modelregistry"
+  filesystem_name    = azurerm_storage_container.containers["data"].name
+  storage_account_id = azurerm_storage_account.cdp.id
+  resource           = "directory"
 }
 
 output "storage" {
@@ -66,6 +86,14 @@ resource "azurerm_user_assigned_identity" "raz" {
 
   tags = var.tags
 }
+resource "azurerm_user_assigned_identity" "cmk" {
+  count               = var.cmk_ds_mi_name == null ? 0:1
+  location            = var.location
+  name                = var.cmk_ds_mi_name
+  resource_group_name = local.resource_group_name
+
+  tags = var.tags
+}
 
 output "mi_ids" {
   value = {
@@ -74,6 +102,7 @@ output "mi_ids" {
     logger     = azurerm_user_assigned_identity.managed_id["logger"].id
     ranger     = azurerm_user_assigned_identity.managed_id["ranger"].id
     raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].id
+    cmk_ds     = var.cmk_ds_mi_name == null ? null : azurerm_user_assigned_identity.cmk[0].id
   }
 }
 output "mi_principal_ids" {
@@ -83,6 +112,7 @@ output "mi_principal_ids" {
     logger     = azurerm_user_assigned_identity.managed_id["logger"].principal_id
     ranger     = azurerm_user_assigned_identity.managed_id["ranger"].principal_id
     raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].principal_id
+    cmk        = var.cmk_ds_mi_name == null ? null : azurerm_user_assigned_identity.cmk[0].principal_id
   }
 }
 output "storage_account" {

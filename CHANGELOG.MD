@@ -1,5 +1,11 @@
 # Change log for module cdp-prerequisite for Azure
 
+## v0.2.12 Consolidated Azure update
+- issue #30, add variables to control network rule for storage account.
+- issue #29 #17, add managed identity for CMK and AKS admin. This MI is also used for PGDB encryption and storage account encryption.
+- issue #16 replace deprecated feature
+- issue #28 #23, permission adjustment for logger MI for CAI
+
 ## v0.2.11-2 non-feature update
 - update readmes
 
