@@ -74,8 +74,8 @@ output "cmk_key_vault_id" {
 
 #### Change the storage account setting
 resource "azurerm_storage_account_customer_managed_key" "cdp" {
-  count                     = var.storage_account_id == null ? 0 : 1
-  storage_account_id        = var.storage_account_id
+  for_each                  = var.storage_account_ids
+  storage_account_id        = each.value
   key_vault_key_id          = azurerm_key_vault_key.default.id
   user_assigned_identity_id = var.managed_identity_id
 }

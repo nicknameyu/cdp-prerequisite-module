@@ -1,4 +1,9 @@
 # Change log for module cdp-prerequisite for Azure
+## v0.2.13 Consolidated Azure update
+- issue #22, new managed identies introduced by CDE 1.25.2 
+- issue #33, new permission required by CDE 1.25.2
+- issue #34, new permission required by CDP 7.3.2
+- issue #35, Redesign storage encryption dependency among modules.
 
 ## v0.2.12 Consolidated Azure update
 - issue #30, add variables to control network rule for storage account.

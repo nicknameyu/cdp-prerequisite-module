@@ -105,3 +105,19 @@ resource "azurerm_role_assignment" "raz" {
   role_definition_name = each.value["role"]
   principal_id         = each.value["principal_id"]
 }
+
+############## DE MI role Assignment ###########
+resource "azurerm_role_assignment" "cde" {
+  // Service and cluster MIs need Storage Blob Data Contributor on Logger container
+  for_each             = azurerm_user_assigned_identity.de_managed_identities
+  scope                = azurerm_storage_container.containers["logs"].id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = each.value.principal_id
+}
+resource "azurerm_role_assignment" "cde_nfs" {
+  // CMK-data service MI needs "Storage Account Contributor" on the CDE NFS
+  count                = var.enable_de && var.create_nfs && var.cmk_ds_mi_name != null ? 1:0
+  scope                = azurerm_storage_account.nfs[0].id
+  role_definition_name = "Storage Account Contributor"
+  principal_id         = azurerm_user_assigned_identity.cmk[0].principal_id
+}

@@ -106,7 +106,9 @@ variable "env_reduced_permission_actions" {
       "Microsoft.Network/loadBalancers/backendAddressPools/join/action",
       "Microsoft.Resources/deployments/cancel/action",
       "Microsoft.MarketplaceOrdering/offertypes/publishers/offers/plans/agreements/read",
-      "Microsoft.MarketplaceOrdering/offertypes/publishers/offers/plans/agreements/write" 
+      "Microsoft.MarketplaceOrdering/offertypes/publishers/offers/plans/agreements/write",
+      "Microsoft.Resources/deployments/cancel/action",
+      "Microsoft.Resources/deployments/whatIf/action"
     ]
 }
 variable "env_reduced_permission_data_actions" {

@@ -6,8 +6,11 @@ This module provisions the Azure infrastructure prerequisites required to regist
 
 - Optionally creates (or references an existing) Azure Resource Group
 - Creates an ADLS Gen2-enabled Storage Account with three containers: `data`, `logs`, and `backups`
+- Optionally creates a Storage Account for NFS fileshare.
 - Creates four required CDP managed identities: **assumer**, **dataaccess**, **logger**, and **ranger**
 - Optionally creates a **RAZ** (Ranger Authorization Service) managed identity
+- Optionally creates CDE managed identity pairs. One pair of managed identities per CDE environment
+- Optionally creates a managed identity for CMK and data service
 - Assigns all required Azure RBAC roles to each managed identity
 - Supports Customer-Managed Key (CMK) encryption readiness on the storage account
 
@@ -82,6 +85,42 @@ module "cdp_env_prerequisites" {
 }
 ```
 
+### using CMK and CDE and NFS
+
+```hcl
+module "cdp_env_prerequisites" {
+  source = "./azure/env-prerequisites"
+
+  subscription_id       = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+  create_resource_group = false
+  resource_group_name   = "my-existing-rg"
+
+  managed_id = {
+    assumer    = "cdp-assumer-mi"
+    dataaccess = "cdp-dataaccess-mi"
+    logger     = "cdp-logger-mi"
+    ranger     = "cdp-ranger-mi"
+  }
+
+  storage_account_name = "mycdpstorageacct"
+
+  cmk_ds_mi_name = "cdp-cmk-ds-mi"
+  enable_de      = var.enable_de
+  de_mi_names          = {
+                            cluster1 = {
+                              service = "cdp-de-service-mi"
+                              cluster = "cdp-de-cluster-mi"
+                            }
+                            cluster2 = {
+                              service = "cdp-de-service2-mi"
+                              cluster = "cdp-de-cluster2-mi"
+                            }
+                          }
+  enable_ai           = true
+  create_nfs          = true
+  nfs_storage_account_name = "mycdpnfsstorage"
+}
+```
 ---
 
 ## Requirements
@@ -106,6 +145,13 @@ module "cdp_env_prerequisites" {
 | `storage_locations` | Names of the storage containers for data, logs, and backups | `object({ data, logs, backups })` | `{ data = "data", logs = "logs", backups = "backups" }` | No |
 | `obj_storage_performance` | Storage account tier and replication type | `object({ account_tier, replication })` | `{ account_tier = "Standard", replication = "LRS" }` | No |
 | `raz_mi_name` | Name for the optional RAZ managed identity. Set to `null` to skip creation. | `string` | `null` | No |
+| `create_nfs` | Switch for whether to create NFS | `bool` | `false` | No |
+| `nfs_storage_account_name` | The storage account name for the NFS storage | `string` | `null` | No |
+| `nfs_file_share_name` | Name of the file share | `string` | `cml-fs` | No |
+| `nfs_storage_performance` | Performance parameter for NFS storage account | `object({account_tier, replication})` | - | No |
+| `nfs_size` | The size of the file share for CML in GB | `number` | 100 | No|
+| `enable_de` | A switch to control whether to create managed identities for Data Engineering | `bool` | `false` | No |
+| `de_mi_names` | Names for the managed identities serving for Data Engineer. There could be multiple DE services on each environment, and each DE service requires a pair of managed identities.When `var.enable_de` is set to true, this variable can't be null. | `map(object({service, cluster}))` | `null` | No |
 | `tags` | Tags to apply to all created resources | `map(string)` | `null` | No |
 
 ---
@@ -119,6 +165,8 @@ module "cdp_env_prerequisites" {
 | `storage_locations` | Structured storage location strings suitable for CDP environment registration |
 | `mi_ids` | Resource IDs for all managed identities (assumer, dataaccess, logger, ranger, raz) |
 | `mi_principal_ids` | Principal IDs for all managed identities, used for role assignments and CDP registration |
+| `de_mi_ids` | Principal ID and resource IDs for DE managed identities |
+| `nfs_storage` | Storage account ID and NFS file share URI for CDE and CAI |
 
 ---
 
@@ -133,6 +181,10 @@ module "cdp_env_prerequisites" {
 | `azurerm_user_assigned_identity.raz` | `azurerm_user_assigned_identity` | Optional RAZ managed identity |
 | `azurerm_role_assignment.assignment` | `azurerm_role_assignment` | RBAC role assignments for all core managed identities |
 | `azurerm_role_assignment.raz` | `azurerm_role_assignment` | RBAC role assignments for the RAZ managed identity (conditional) |
+| `azurerm_storage_account.nfs` | `azurerm_storage_account` | NFS storage account for CDE and CAI (conditional) |
+| `azurerm_storage_share.nfs` | `azurerm_storage_share` | NFS file share for CAI (conditional) |
+| `azurerm_user_assigned_identity.cmk` | `azurerm_user_assigned_identity` | Managed identity for CMK and Data Services(conditional) |
+| `azurerm_user_assigned_identity.de_managed_identities` | `azurerm_user_assigned_identity` | Managed identities for DE (conditional) |
 
 ---
 
@@ -160,6 +212,7 @@ The following Azure RBAC roles are assigned automatically:
 | `logs` container | Storage Blob Data Contributor |
 | `backups` container | Storage Blob Data Contributor |
 | Storage Account | Storage Account Contributor |
+| `data` container | Storage Blob Data Contributor |
 
 ### Ranger Identity
 | Scope | Role |
@@ -171,8 +224,20 @@ The following Azure RBAC roles are assigned automatically:
 ### RAZ Identity *(optional)*
 | Scope | Role |
 |-------|------|
-| Storage Account | Storage Blob Data Owner |
-| Storage Account | Storage Blob Delegator |
+| CDP Storage Account | Storage Blob Data Owner |
+| CDP Storage Account | Storage Blob Delegator |
+
+### CMK/DS Identity *(optional)*
+| Scope | Role |
+|-------|------|
+| NFS Storage Account | Storage Account Contributor |
+
+### DE Identity *(optional)*
+| Scope | Role |
+|-------|------|
+| NFS Storage Account | Storage Account Contributor |
+| `logs` container | Storage Blob Data Contributor |
+
 
 ---
 
