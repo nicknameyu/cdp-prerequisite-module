@@ -92,7 +92,7 @@ The `azurerm` provider must be configured before calling this module (e.g. via e
 | `enable_access_policy` | `bool` | `false` | no | Whether to create Key Vault access policies. When `true`, the vault is configured with Access Policy authorization instead of RBAC |
 | `spn_object_id` | `string` | `null` | conditional | Object ID of the Service Principal to grant access. Required when `enable_access_policy = true` |
 | `managed_identity_id` | `string` | `null` | conditional | Full resource ID of the User-Assigned Managed Identity to grant access. Required when `enable_access_policy = true` or `storage_account_id` is set |
-| `storage_account_id` | `string` | `null` | no | Resource ID of a Storage Account to configure with CMK encryption |
+| `storage_account_ids` | `map(string}` | `null` | no | Map of Resource ID of a Storage Account to configure with CMK encryption |
 | `tags` | `map(string)` | `null` | no | Tags to apply to created resources |
 
 ### Validation rules
@@ -122,7 +122,7 @@ The `azurerm` provider must be configured before calling this module (e.g. via e
 | `azurerm_key_vault_key.default` | Always created |
 | `azurerm_role_assignment.caller` | Created when `create_keyvault = true`; assigns **Key Vault Crypto Officer** to the Terraform caller |
 | `azurerm_key_vault_access_policy.kv` | Created when `enable_access_policy = true`; one policy each for the SPN, Managed Identity, and current caller |
-| `azurerm_storage_account_customer_managed_key.cdp` | Created when `storage_account_id` is provided |
+| `azurerm_storage_account_customer_managed_key.cdp` | Created when `storage_account_ids` is provided |
 
 ### Access policy permissions
 

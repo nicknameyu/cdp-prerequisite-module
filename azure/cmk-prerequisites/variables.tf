@@ -60,7 +60,7 @@ variable "managed_identity_id" {
     error_message = "managed_identity_id cannot be null or empty when enable_access_policy is true."
   }
   validation {
-    condition     = var.storage_account_id == null || (var.storage_account_id != null && var.managed_identity_id != null)
+    condition     = var.storage_account_ids == null || (var.storage_account_ids != null && var.managed_identity_id != null)
     error_message = "managed_identity_id cannot be null or empty when storage_account_id is not null. Cause storage account CMK encryption must be configured with a managed identity."
   }
 }
@@ -79,8 +79,8 @@ variable "enable_access_policy" {
 }
 
 #############
-variable "storage_account_id" {
-  type = string
+variable "storage_account_ids" {
+  type = map(string)
   default = null
-  description = "The ID of the storeage account to be encrypted with the CMK. When provided, the storage account will be configured with CMK encryption."
+  description = "The IDs of the storeage account to be encrypted with the CMK. When provided, the storage account will be configured with CMK encryption."
 }

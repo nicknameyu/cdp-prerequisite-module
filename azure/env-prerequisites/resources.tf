@@ -15,6 +15,8 @@ locals{
 data "http" "myip" {
   url = "http://ipv4.icanhazip.com"
 }
+
+### CDP Environment Storage ###
 resource "azurerm_storage_account" "cdp" {
   name                     = var.storage_account_name
   resource_group_name      = local.resource_group_name
@@ -69,7 +71,46 @@ output "storage" {
     backup-location  = "${var.storage_locations.backups}@${azurerm_storage_account.cdp.primary_dfs_host}"
   }
 }
+
+#### CAI and CDE NFS ####
+resource "azurerm_storage_account" "nfs" {
+  count                      = var.create_nfs ? 1:0
+  name                       = var.nfs_storage_account_name
+  resource_group_name        = local.resource_group_name
+  location                   = var.location
+  account_tier               = var.nfs_storage_performance.account_tier
+  account_replication_type   = var.nfs_storage_performance.replication
+  account_kind               = "FileStorage"
+  https_traffic_only_enabled = false
+
+  dynamic "identity" {
+    for_each = var.cmk_ds_mi_name != null ? [1] : []
+    content {
+      type         = "UserAssigned"
+      identity_ids = [azurerm_user_assigned_identity.cmk[0].id]
+    }
+  }
+  network_rules {
+    default_action             = (length(var.storage_ip_rules) > 0 || length(var.subnet_ids) > 0) ? "Deny" : "Allow"
+    ip_rules                   = distinct(concat(var.storage_ip_rules, [chomp(data.http.myip.response_body)] ))
+    virtual_network_subnet_ids = var.subnet_ids
+  }
+
+  tags = var.tags
+  lifecycle {
+    ignore_changes = [ customer_managed_key ]
+  }
+}
+resource "azurerm_storage_share" "nfs" {
+  count                = var.enable_ai ? 1:0
+  name                 = var.nfs_file_share_name
+  storage_account_id   = azurerm_storage_account.nfs[0].id
+  quota                = var.nfs_size 
+  enabled_protocol     = "NFS"
+}
+
 ############## Managed Identity #################
+//Standard/minimum managed identities
 resource "azurerm_user_assigned_identity" "managed_id" {
   for_each            = var.managed_id
   location            = var.location
@@ -78,6 +119,8 @@ resource "azurerm_user_assigned_identity" "managed_id" {
 
   tags                = var.tags
 }
+
+//RAZ managed identity
 resource "azurerm_user_assigned_identity" "raz" {
   count               = var.raz_mi_name == null ? 0:1
   location            = var.location
@@ -86,6 +129,8 @@ resource "azurerm_user_assigned_identity" "raz" {
 
   tags = var.tags
 }
+
+//CMK and Data service managed identity
 resource "azurerm_user_assigned_identity" "cmk" {
   count               = var.cmk_ds_mi_name == null ? 0:1
   location            = var.location
@@ -93,6 +138,36 @@ resource "azurerm_user_assigned_identity" "cmk" {
   resource_group_name = local.resource_group_name
 
   tags = var.tags
+}
+
+//CDE managed identities
+locals {
+  # Flatten the map of DE MI pairs into a list of individual MIs with their roles
+  de_mi_pairs = var.enable_de && var.de_mi_names != null ? merge([
+    for de_key, de_value in var.de_mi_names : {
+      "${de_key}_service" = {
+        de_key = de_key
+        role   = "service"
+        name   = de_value.service
+      }
+      "${de_key}_cluster" = {
+        de_key = de_key
+        role   = "cluster"
+        name   = de_value.cluster
+      }
+    }
+  ]...) : {}
+}
+resource "azurerm_user_assigned_identity" "de_managed_identities" {
+  for_each            = local.de_mi_pairs
+  name                = each.value.name
+  resource_group_name = var.resource_group_name
+  location            = var.location
+
+  tags                = merge(var.tags, {
+                          de_service = each.value.de_key
+                          mi_role    = each.value.role
+                        })
 }
 
 output "mi_ids" {
@@ -113,6 +188,17 @@ output "mi_principal_ids" {
     ranger     = azurerm_user_assigned_identity.managed_id["ranger"].principal_id
     raz        = var.raz_mi_name == null ? null : azurerm_user_assigned_identity.raz[0].principal_id
     cmk        = var.cmk_ds_mi_name == null ? null : azurerm_user_assigned_identity.cmk[0].principal_id
+    cmk_ds     = var.cmk_ds_mi_name == null ? null : azurerm_user_assigned_identity.cmk[0].principal_id
+  }
+}
+output "de_mi_ids" {
+  description = "Map of DE managed identity resource IDs, keyed by de_key + role."
+  value = {
+    for k, v in azurerm_user_assigned_identity.de_managed_identities :
+    k => {
+      id           = v.id
+      principal_id = v.principal_id
+    }
   }
 }
 output "storage_account" {
@@ -132,4 +218,9 @@ output "storage_locations" {
     backup_location       = "${var.storage_locations.backups}@${azurerm_storage_account.cdp.primary_dfs_host}"
   }
 }
-
+output "nfs_storage" {
+  value = {
+    nfs_file_share     = var.enable_ai  ? "nfs://${azurerm_storage_account.nfs[0].primary_file_host}:/${var.nfs_storage_account_name}/${azurerm_storage_share.nfs[0].name}" : null
+    storage_account_id = var.create_nfs ? azurerm_storage_account.nfs[0].id : null
+  }
+}
