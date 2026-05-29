@@ -1,5 +1,7 @@
 # DNS Zone Role Assignment
 
+This module is merged into [service-principal](../service-principal/). Will keep this module for a while and deprecate it in the future.
+
 This Terraform module creates role assignments for a Service Principal and Managed Identity to perform the required private DNS zone operations in Azure. It is intended for use in cross-subscription scenarios where the private DNS zones reside in a **different subscription** than the CDP (Cloudera Data Platform) resources.
 
 The module supports two role assignment modes:

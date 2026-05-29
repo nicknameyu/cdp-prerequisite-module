@@ -8,26 +8,16 @@ CDP on Azure requires a Service Principal (SPN) and one or more Managed Identiti
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| `spn_permissions` | Merged `actions` and `data_actions` for the CDP Service Principal, plus the recommended scope (`CDP Subscription`). |
-| `mi_permissions` | Merged `actions` and `data_actions` for Managed Identities, plus the recommended scope (`CDP Subscription`). |
-| `dns_zone_permissions` | Actions required on an external Private DNS Zone subscription (if DNS zones live outside the CDP subscription). |
+`custom_permissions`: Merged `actions` and `data_actions` for the CDP Service Principal and managed identity.
 
 ### Output structure
-
-Both `spn_permissions` and `mi_permissions` return an object:
 
 ```hcl
 {
   actions      = [ ... ]   # list of ARM action strings
   data_actions = [ ... ]   # list of ARM data-action strings
-  scope        = "CDP Subscription"
 }
 ```
-
-`dns_zone_permissions` returns a plain `list(string)` of ARM action strings.
-
 ## Usage
 
 ```hcl
@@ -69,7 +59,7 @@ These flags control which service-specific permission sets are merged into the f
 | `enable_liftie` | `bool` | `true` | Include permissions required for **Liftie** (the Kubernetes cluster manager used by ML and other services). |
 | `enable_de` | `bool` | `true` | Include permissions required for **CDP Data Engineering**. |
 | `enable_cmk` | `bool` | `true` | Include permissions required for **Customer-Managed Keys (CMK)** via Azure Key Vault. |
-| `enable_dns_zone_subscription` | `bool` | `true` | Indicates that Private DNS zones reside in a subscription other than the CDP subscription. When `true`, `dns_zone_permissions` provides the actions to assign on the remote subscription. |
+
 
 ### Permission list overrides
 
@@ -84,7 +74,6 @@ Each permission list has a sensible default but can be overridden if your enviro
 | `de_actions` | `list(string)` | Additional actions merged in when `enable_de = true`. Covers Azure Database for MySQL flexible server lifecycle and private endpoint approval. |
 | `cmk_rbac_actions` | `list(string)` | Additional actions merged in when `enable_cmk = true`. Covers Key Vault read/write and Disk Encryption Sets. |
 | `cmk_rbac_data_actions` | `list(string)` | Additional data actions merged in when `enable_cmk = true`. Covers Key Vault key operations (wrap, unwrap, encrypt, decrypt, sign, verify, backup). |
-| `dns_zone_actions` | `list(string)` | Actions required on a remote Private DNS Zone subscription. Returned directly via the `dns_zone_permissions` output. |
 
 ## Permission Sets by Service
 
@@ -125,17 +114,9 @@ Covers the core Azure resources that every CDP environment requires:
 - Disk Encryption Sets
 - Key Vault key operations: wrap/unwrap, encrypt/decrypt, sign/verify, backup
 
-### External Private DNS Zone (`enable_dns_zone_subscription`)
-
-- Read/write/delete on private DNS zones and A records
-- Virtual network link reads and join actions
-
 ## Notes
 
 - All permission lists are **deduplicated** using Terraform's `distinct()` function before being returned, so overlapping permissions across services are merged cleanly.
-- The `mi_permissions` output intentionally excludes the base `env_reduced_permission_actions` (SPN-only actions) and contains only the subset relevant to Managed Identities (DW, Liftie, CMK, and blob data actions).
-- The `dns_zone_permissions` output should be used to create a role assignment in the **DNS zone subscription**, separate from the main CDP subscription role.
-- For the built-in alternative to a custom DNS zone role, Azure's `Private DNS Zone Contributor` built-in role covers the same set of actions.
 
 ## Requirements
 

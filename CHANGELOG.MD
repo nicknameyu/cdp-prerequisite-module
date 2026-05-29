@@ -1,4 +1,19 @@
 # Change log for module cdp-prerequisite for Azure
+## v0.3.0 Azure RBAC redesign
+### Major change idea
+- https://github.com/nicknameyu/cdp-prerequisite-module/issues/36#issuecomment-4403511459
+
+### Module service-principal
+- Adding managed identiy RBAC to this module.
+- Use different roles for different purpose and on different scope:
+  - "Key Vault Crypto Service Encryption User" for Key Vault
+  - "Private DNS Zone Contributor" for private DNS Zone
+  - "Network Contributor" for VNET
+- Calculate RBAC scope automatically base on the input.
+  - KV RBAC scope is the KeyVault
+  - Private DNS zone RBAC is on the private DNS zone resource group. Because there could be multiple private DNS zones.
+  - VNET RBAC is on VNET resource group. But in some combinations, even the VNET resource group ID is provided, the module will still force the RBAC at subscription level. 
+
 ## v0.2.13 Consolidated Azure update
 - issue #22, new managed identies introduced by CDE 1.25.2 
 - issue #33, new permission required by CDE 1.25.2

@@ -63,9 +63,6 @@ variable "env_reduced_permission_actions" {
       "Microsoft.ManagedIdentity/userAssignedIdentities/read",
       "Microsoft.ManagedIdentity/userAssignedIdentities/assign/action",
       "Microsoft.DBforPostgreSQL/flexibleServers/PrivateEndpointConnectionsApproval/action",  // added base on testing 09/04/2024 for supporting privatelink for postgres db flexible server
-      "Microsoft.DBforPostgreSQL/servers/read",
-      "Microsoft.DBforPostgreSQL/servers/write",
-      "Microsoft.DBforPostgreSQL/servers/delete",
       "Microsoft.DBforPostgreSQL/flexibleServers/read",
       "Microsoft.DBforPostgreSQL/flexibleServers/write",
       "Microsoft.DBforPostgreSQL/flexibleServers/delete",
@@ -82,8 +79,7 @@ variable "env_reduced_permission_actions" {
       "Microsoft.Network/privateEndpoints/delete",
       "Microsoft.Network/privateEndpoints/privateDnsZoneGroups/read",
       "Microsoft.Network/privateEndpoints/privateDnsZoneGroups/write",
-      "Microsoft.DBforPostgreSQL/servers/privateEndpointConnectionsApproval/action",
-      "Microsoft.DBforPostgreSQL/flexibleServers/privateEndpointConnectionsApproval/action",    // Added base on testing 01/10/2025
+      "Microsoft.DBforPostgreSQL/flexibleServers/privateEndpointConnectionsApproval/action",
       "Microsoft.DBforPostgreSQL/flexibleServers/privateEndpointConnections/read",              // Added base on testing 01/10/2025
       "Microsoft.DBforPostgreSQL/flexibleServers/privateEndpointConnections/delete",            // Added base on testing 01/10/2025
       "Microsoft.DBforPostgreSQL/flexibleServers/privateEndpointConnections/write",             // Added base on testing 01/10/2025
