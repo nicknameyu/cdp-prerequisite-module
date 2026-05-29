@@ -81,6 +81,6 @@ variable "enable_access_policy" {
 #############
 variable "storage_account_ids" {
   type = map(string)
-  default = null
+  default = {}
   description = "The IDs of the storeage account to be encrypted with the CMK. When provided, the storage account will be configured with CMK encryption."
 }

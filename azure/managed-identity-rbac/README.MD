@@ -1,5 +1,7 @@
 # Cloudera Data Services – Managed Identity RBAC Prerequisites
 
+This module has been merged to [service-principal](../service-principal/) module. I will keep this module for a while and deprecate it in the future.
+
 This module creates custom role definitions and role assignments for the Managed Identity required by Cloudera Data Services (Data Warehouse, Data Engineering, DataFlow, Cloudera AI) on Azure. It also supports Customer-Managed Key (CMK) RBAC permissions.
 
 The Managed Identity needs specific permissions to manage AKS clusters and PostgreSQL/MySQL database operations. These permissions are scoped at the subscription level and are not required for CDP Datalake or DataHub, which use a Service Principal instead.

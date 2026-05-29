@@ -179,8 +179,10 @@ module "cdp_env_prerequisites" {
 | `azurerm_storage_container.containers` | `azurerm_storage_container` | Storage containers for data, logs, and backups |
 | `azurerm_user_assigned_identity.managed_id` | `azurerm_user_assigned_identity` | Four required CDP managed identities |
 | `azurerm_user_assigned_identity.raz` | `azurerm_user_assigned_identity` | Optional RAZ managed identity |
+| `azurerm_user_assigned_identity.de_managed_identities` | `azurerm_user_assigned_identity` | Optional DE managed identities |
 | `azurerm_role_assignment.assignment` | `azurerm_role_assignment` | RBAC role assignments for all core managed identities |
 | `azurerm_role_assignment.raz` | `azurerm_role_assignment` | RBAC role assignments for the RAZ managed identity (conditional) |
+| `azurerm_role_assignment.cde` | `azurerm_role_assignment` | RBAC role assignments for the CDE managed identities (conditional) |
 | `azurerm_storage_account.nfs` | `azurerm_storage_account` | NFS storage account for CDE and CAI (conditional) |
 | `azurerm_storage_share.nfs` | `azurerm_storage_share` | NFS file share for CAI (conditional) |
 | `azurerm_user_assigned_identity.cmk` | `azurerm_user_assigned_identity` | Managed identity for CMK and Data Services(conditional) |

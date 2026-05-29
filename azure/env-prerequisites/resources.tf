@@ -11,6 +11,9 @@ data "azurerm_resource_group" "prerequisite" {
 locals{
   resource_group_name = var.create_resource_group ? azurerm_resource_group.prerequisite[0].name : data.azurerm_resource_group.prerequisite[0].name
 }
+output "prerequisite_resouorce_group_id" {
+  value = var.create_resource_group ? azurerm_resource_group.prerequisite[0].id : data.azurerm_resource_group.prerequisite[0].id
+}
 ############# Storage ############
 data "http" "myip" {
   url = "http://ipv4.icanhazip.com"
