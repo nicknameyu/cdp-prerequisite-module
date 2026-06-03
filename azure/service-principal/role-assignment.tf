@@ -1,12 +1,17 @@
+data "azurerm_subscription" "current" {}
+
 locals {
+  principals = merge({ spn = var.spn_object_id }, var.mi_object_id == null ? {} : { mi = var.mi_object_id } )
+  rbac_scope = length(var.rbac_scope) == 0 ? {sub = data.azurerm_subscription.current.id} : var.rbac_scope
   role_assignments = {
-    for pair in setproduct(keys(local.principals), keys(local.scope)) :
+    for pair in setproduct(keys(local.principals), keys(local.rbac_scope)) :
     "${pair[0]}__${pair[1]}" => {
       principal_id = local.principals[pair[0]]
-      scope        = local.scope[pair[1]]
+      scope        = local.rbac_scope[pair[1]]
     }
   }
 }
+
 resource "azurerm_role_assignment" "cdp" {
   for_each             = local.role_assignments
   scope                = each.value.scope
@@ -36,7 +41,7 @@ module "custom_role_permissions" {
 resource "azurerm_role_definition" "reduced" {
   count       = var.create_custom_role ? 1:0
   name        = var.custom_role_name
-  scope       = "/subscriptions/${local.subscription_id}"
+  scope       = "/subscriptions/${data.azurerm_subscription.current.subscription_id}"
   description = "Custom role for CDP provisioning with reduced permission."
 
 
@@ -46,6 +51,6 @@ resource "azurerm_role_definition" "reduced" {
   }
 
   assignable_scopes = [
-    "/subscriptions/${local.subscription_id}", # /subscriptions/00000000-0000-0000-0000-000000000000
+    data.azurerm_subscription.current.id
   ]
 }

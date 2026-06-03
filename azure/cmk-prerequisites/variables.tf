@@ -19,10 +19,15 @@ variable "tags" {
 }
 
 ############### Key Vault resource variables ###############
+variable "create_resource_group" {
+  type = bool
+  default = false
+  description = "Flag to control whether to create a resource group."
+}
 variable "create_keyvault" {
   type    = bool
   default = true
-  description = "Switch for whether to create the Key Vault. "
+  description = "Switch for whether to create the Key Vault. Force creating key vault when `create_resource_group` is true."
 }
 
 variable "key_vault_name" {
@@ -59,10 +64,6 @@ variable "managed_identity_id" {
     condition     = var.enable_access_policy == false || (var.enable_access_policy == true && var.managed_identity_id != null)
     error_message = "managed_identity_id cannot be null or empty when enable_access_policy is true."
   }
-  validation {
-    condition     = var.storage_account_ids == null || (var.storage_account_ids != null && var.managed_identity_id != null)
-    error_message = "managed_identity_id cannot be null or empty when storage_account_id is not null. Cause storage account CMK encryption must be configured with a managed identity."
-  }
 }
 
 
@@ -78,9 +79,3 @@ variable "enable_access_policy" {
   description = "Control whether to create access policy."
 }
 
-#############
-variable "storage_account_ids" {
-  type = map(string)
-  default = {}
-  description = "The IDs of the storeage account to be encrypted with the CMK. When provided, the storage account will be configured with CMK encryption."
-}

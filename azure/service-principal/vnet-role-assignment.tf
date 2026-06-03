@@ -22,12 +22,12 @@ locals {
   # - Subscription level if force_sub_rbac is true (DS enabled + MI in use)
   # - Subscription level if vnet_resource_group_id is null (no RG scoping possible)
   # - Otherwise, use the provided resource group
-  vnet_rbac_scope = (local.force_sub_rbac || var.vnet_resource_group_id == null) ? "/subscriptions/${local.subscription_id}" : var.vnet_resource_group_id
+  vnet_rbac_scope = (local.force_sub_rbac || var.vnet_resource_group_id == null) ? data.azurerm_subscription.current.id : var.vnet_resource_group_id
 
   # Skip VNET assignment entirely when scope_level is SUBSCRIPTION, because
   # SPN and MI already received network permissions at subscription level via
   # the broader scope assignment — no additional VNET assignment needed.
-  vnet_assignment = local.scope_level == "SUBSCRIPTION" ? {} : local.principals
+  vnet_assignment = length(var.rbac_scope) == 0 ? {} : local.principals
 }
 resource "azurerm_role_assignment" "vnet" {
   for_each             = local.vnet_assignment

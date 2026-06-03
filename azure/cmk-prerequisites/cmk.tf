@@ -5,19 +5,21 @@ data "azurerm_key_vault" "kv" {
   count               = var.create_keyvault ? 0:1
   name                = var.key_vault_name
   resource_group_name = var.resource_group_name
-  lifecycle {
-    postcondition {
-      condition     = ! self.rbac_authorization_enabled 
-      error_message = "Key Vault must be configured with Access Policy for authorization."
-    }
-  }
+}
+resource "azurerm_resource_group" "kv" {
+  count    = var.create_resource_group ? 1:0
+  name     = var.resource_group_name
+  provider = azurerm.kv
+  location = var.location
+  tags     = var.tags
 }
 resource "azurerm_key_vault" "kv" {
-  count                      = var.create_keyvault ? 1:0
+  count                      = var.create_resource_group || var.create_keyvault ? 1:0
   name                       = var.key_vault_name
   location                   = var.location
+  provider                   = azurerm.kv
   rbac_authorization_enabled = ! var.enable_access_policy
-  resource_group_name        = var.resource_group_name
+  resource_group_name        = var.create_resource_group ? azurerm_resource_group.kv[0].name : var.resource_group_name
   tenant_id                  = data.azurerm_subscription.current.tenant_id
   sku_name                   = "premium"
   soft_delete_retention_days = 7
@@ -35,12 +37,14 @@ locals {
 resource "azurerm_role_assignment" "caller" {
   count                = var.create_keyvault ? 1:0
   principal_id         = data.azurerm_client_config.current.object_id
+  provider             = azurerm.kv
   role_definition_name = "Key Vault Crypto Officer"
   scope                = azurerm_key_vault.kv[0].id
 }
 ### Create CMK
 resource "azurerm_key_vault_key" "default" {
   name         = var.key_name
+  provider     = azurerm.kv
   key_vault_id = local.key_vault_id
   key_type     = "RSA"
   key_size     = 2048
@@ -72,10 +76,3 @@ output "cmk_key_vault_id" {
   value = var.create_keyvault ? azurerm_key_vault.kv[0].id : data.azurerm_key_vault.kv[0].id
 }
 
-#### Change the storage account setting
-resource "azurerm_storage_account_customer_managed_key" "cdp" {
-  for_each                  = var.storage_account_ids
-  storage_account_id        = each.value
-  key_vault_key_id          = azurerm_key_vault_key.default.id
-  user_assigned_identity_id = var.managed_identity_id
-}
