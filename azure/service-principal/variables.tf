@@ -65,6 +65,20 @@ variable "enable_liftie" {
   description = "Enable Liftie permissions. Default to false because contributor permission is default setting."
 }
 
+## Subscription IDs for KeyVault and private DNS zone.
+## Theoretically speaking, these subscription IDs can be calculated by the `key_vault_id`, `scope`, and `private_dns_zone_resource_group_id` variables. But in some circumstances, these
+## variables are generated from output of other resources, which make it impossible for terraform to calculate the value in this module at the planning stage. 
+variable "kv_subscription_id" {
+  type = string
+  default = null
+  description = "Key Vault subscription ID. Default to null. When set to `null`, the key vault is in the same subscription with the CDP resources."
+}
+variable "dns_zone_subscription_id" {
+  type = string
+  default = null
+  description = "Private DNS zone subscription ID. Default to null. When set to `null`, the private DNS zone resource group is in the same subscription with the CDP resources."
+}
+
 ## Permissions on supporting resources.
 variable "key_vault_id" {
   type = string
@@ -85,45 +99,33 @@ variable "private_dns_zone_resource_group_id" {
 }
 
 ## Scope and permission calculation
-variable "scope" {
   // The reason of designing this variable as a map is: there is the possibility that a customer may split the environment resources in two resource groups, 
-  // one for prerequisite, and the other for compute resources. There are too many prerequisites resources in current environment setup. One resoruce group makes it very messy for administration purpose. 
-  type = map(string)
-  description = "Map of Azure subscription or resource groups for this module to assign the RBAC to."
-  validation {
-    condition = length(var.scope) <= 1 || length(distinct([
-      for id in values(var.scope) :
-      regex("/subscriptions/([^/]+)", lower(id))[0]
-    ])) == 1
-    error_message = "All resource IDs in 'scope' must belong to the same Azure subscription."
-  }
+  // one for prerequisite, and the other for compute resources. There are too many prerequisites resources in current environment setup. One resoruce group 
+  // makes it very messy for administration purpose. 
+variable "rbac_scope" {
+  type        = map(string)
+  default     = {}
+  description = "Map of Azure resource group IDs for this module to assign the RBAC to. When empty, RBAC at subscription level."
+
   validation {
     condition = alltrue([
-      for id in values(var.scope) :
-      can(regex("^/subscriptions/[^/]+$", lower(id))) ||
-      can(regex("^/subscriptions/[^/]+/resourcegroups/[^/]+$", lower(id)))
+      for v in values(var.rbac_scope) :
+      can(regex(
+        "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/resourceGroups/[^/]+$",
+        v
+      ))
     ])
-    error_message = "All values in 'scope' must be either a subscription resource ID (/subscriptions/<id>) or a resource group resource ID (/subscriptions/<id>/resourceGroups/<name>)."
-  }
-}
-
-
-locals {
-  principals = merge({ spn = local.spn_object_id }, var.mi_object_id == null ? {} : { mi = var.mi_object_id } )
-  subscription_id = regex("/subscriptions/([^/]+)", lower(values(var.scope)[0]))[0]
-  /*
-  Calculate scope and scope level base on var.scope. If one of the elements is subscription ID, then ignore everything else, assign two values: one is local.scope_level = "SUBSCRIPTION", 
-  the other is the local.scope = {cdp = <the subscription ID>}; otherwise, the local.scope_level = "RESOURCEGROUP",  local.scope = var.scope.
-  */
-  subscription_ids = {
-    for key, id in var.scope :
-    key => id
-    if can(regex("^/subscriptions/[^/]+$", lower(id)))
+    error_message = "All values must be valid Azure resource group IDs in the format: /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}."
   }
 
-  scope_level = length(local.subscription_ids) > 0 ? "SUBSCRIPTION" : "RESOURCEGROUP"
-
-  scope = local.scope_level == "SUBSCRIPTION" ? {
-    cdp = "/subscriptions/${local.subscription_id}"
-  } : var.scope
+  validation {
+    condition = length(distinct([
+      for v in values(var.rbac_scope) :
+      regex(
+        "/subscriptions/([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/",
+        v
+      )[0]
+    ])) <= 1
+    error_message = "All resource groups must belong to the same subscription."
+  }
 }

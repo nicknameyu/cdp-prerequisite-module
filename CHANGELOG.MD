@@ -1,4 +1,9 @@
 # Change log for module cdp-prerequisite for Azure
+## v0.3.1 Azure encryption and rbac
+- #43 deprecate access policy restriction when providing an existing KeyVault
+- #40 Move storage encryption out from CMK module
+- #42 Use variable rather than calculation in RBAC for service principal RBAC.
+- Remove the caluclation for not assigning KV, DNS Zone, VNET related roles when these resources are in the same subscription as the primary subscription and the primary RBAC is already at subscription level. These calculations are reasonable, but too complex for users to understand. Instead, assign the permissions regardless. 
 ## v0.3.0 Azure RBAC redesign
 ### Major change idea
 - https://github.com/nicknameyu/cdp-prerequisite-module/issues/36#issuecomment-4403511459
