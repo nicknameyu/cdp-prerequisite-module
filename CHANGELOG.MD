@@ -1,4 +1,7 @@
 # Change log for module cdp-prerequisite for Azure
+## v0.3.2 AWS KMS bug fix
+- use R/W policy instead of readonly policy.
+
 ## v0.3.1 Azure encryption and rbac
 - #43 deprecate access policy restriction when providing an existing KeyVault
 - #40 Move storage encryption out from CMK module

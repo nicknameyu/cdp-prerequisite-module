@@ -66,12 +66,19 @@ resource "aws_iam_policy" "kms_ro" {
   path        = "/"
   description = "aws-cdp-sse-kms-read-only-policy"
 
-  policy = replace(file("${path.module}/policies/aws-cdp-sse-kms-read-only-policy.json"), "$${KEY_ARN}", var.create_key? aws_kms_alias.cdp[0].arn : data.aws_kms_alias.cdp[0].arn)
+  policy = replace(file("${path.module}/policies/aws-cdp-sse-kms-read-only-policy.json"), "$${KEY_ARN}", var.create_key? aws_kms_key.cdp[0].arn : data.aws_kms_key.cdp[0].arn)
   tags        = var.tags
 }
+resource "aws_iam_policy" "kms_rw" {
+  name        = "aws-cdp-sse-kms-read-write-policy"
+  path        = "/"
+  description = "aws-cdp-sse-kms-read-write-policy"
 
+  policy = replace(file("${path.module}/policies/aws-cdp-sse-kms-read-write-policy.json"), "$${KEY_ARN}", var.create_key? aws_kms_key.cdp[0].arn : data.aws_kms_key.cdp[0].arn)
+  tags        = var.tags
+}
 resource "aws_iam_role_policy_attachment" "cdp_roles" {
   for_each   = toset(var.cdp_prerequisite_role_names)
   role       = each.key
-  policy_arn = aws_iam_policy.kms_ro.arn
+  policy_arn = aws_iam_policy.kms_rw.arn
 }
