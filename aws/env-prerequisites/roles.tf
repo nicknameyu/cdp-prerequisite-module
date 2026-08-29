@@ -116,6 +116,7 @@ resource "aws_iam_policy" "dl_backup" {
 
 resource "aws_iam_role_policy_attachment" "ranger" {
   for_each = {
+                dl_admin   = aws_iam_policy.dl_admin.arn
                 restore    = aws_iam_policy.restore.arn 
                 ranger     = aws_iam_policy.ranger.arn
                 bkt_access = aws_iam_policy.bkt_access.arn
