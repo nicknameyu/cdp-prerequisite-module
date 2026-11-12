@@ -8,17 +8,23 @@ provider "azurerm" {
 }
 
 resource "azurerm_role_assignment" "spn_kv" {
-  count                = var.key_vault_id == null ? 0 : 1
+  for_each             = ! var.key_vault_rbac ? {}:{
+                                                      Officer     = "Key Vault Crypto Officer"
+                                                      Contributor = "Key Vault Contributor"
+                                                    }
   principal_id         = var.spn_object_id
   provider             = azurerm.kv
   scope                = var.key_vault_id
-  role_definition_name = "Key Vault Crypto Service Encryption User"
+  role_definition_name = each.value
 }
 
 resource "azurerm_role_assignment" "mi_kv" {
-  count                = var.key_vault_id == null || var.mi_object_id == null ? 0 : 1
+  for_each          = !var.key_vault_rbac ? {}:{
+                                                  Officer     = "Key Vault Crypto Officer"
+                                                  Contributor = "Key Vault Contributor"
+                                                }
   principal_id         = var.mi_object_id
   provider             = azurerm.kv
   scope                = var.key_vault_id
-  role_definition_name = "Key Vault Crypto Service Encryption User"
+  role_definition_name = each.value
 }

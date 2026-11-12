@@ -27,7 +27,7 @@ locals {
   # Skip VNET assignment entirely when scope_level is SUBSCRIPTION, because
   # SPN and MI already received network permissions at subscription level via
   # the broader scope assignment — no additional VNET assignment needed.
-  vnet_assignment = length(var.rbac_scope) == 0 ? {} : local.principals
+  vnet_assignment = !var.vnet_rbac ? {} : local.principals
 }
 resource "azurerm_role_assignment" "vnet" {
   for_each             = local.vnet_assignment

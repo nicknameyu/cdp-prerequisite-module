@@ -25,10 +25,19 @@ variable "spn_app_name" {
 # }
 
 ## Managed identity is being used for CMK, and AKS admin. It share the same permission with the SPN.
+variable "service_mi_rbac" {
+  type        = bool
+  default     = true
+  description = "A flag to indicate whether CMK/Data service MI RBAC is required."
+}
 variable "mi_object_id" {
   type = string
   default = null
   description = "Object ID of the CMK and Data Service managed identity to be used in the CDP environment. When provided, it will be assigned with the same permissions as the SPN."
+  validation {
+    condition     = !var.service_mi_rbac || var.mi_object_id != null
+    error_message = "mi_object_id must not be null when service_mi_rbac is true."
+  }
 }
 
 ## Role assignment
@@ -80,22 +89,49 @@ variable "dns_zone_subscription_id" {
 }
 
 ## Permissions on supporting resources.
+variable "key_vault_rbac" {
+  type        = bool
+  default     = true
+  description = "A flag to indicate whether Key Vault RBAC is required."
+}
 variable "key_vault_id" {
   type = string
   default = null
   description = "The resource ID of the Key Vault. When provided, CMK related RBAC will be granted to the key vault. "
+  validation {
+    condition     = !var.key_vault_rbac || var.key_vault_id != null
+    error_message = "key_vault_id must not be null when private_dns_zone_rbac is true."
+  }
 }
 
+variable "vnet_rbac" {
+  type        = bool
+  default     = true
+  description = "A flag to indicate whether VNET RBAC is required." 
+}
 variable "vnet_resource_group_id" {
   type = string
   default = null
   description = "The resource ID of the VNET resource group. When provided, `Network contributor` permission will be assigned. "
+  validation {
+    condition     = !var.vnet_rbac || var.vnet_resource_group_id != null
+    error_message = "vnet_resource_group_id must not be null when vnet_rbac is true."
+  }
 }
 
+variable "private_dns_zone_rbac" {
+  type        = bool
+  default     = true
+  description = "A flag to indicate whether private DNS zone RBAC is required."
+}
 variable "private_dns_zone_resource_group_id" {
   type = string
   default = null
   description = "The ID of the private DNS zone resource group. When provided, private DNS zone related RBAC will be granted to the key vault."
+  validation {
+    condition     = !var.private_dns_zone_rbac || var.private_dns_zone_resource_group_id != null
+    error_message = "private_dns_zone_resource_group_id must not be null when private_dns_zone_rbac is true."
+  }
 }
 
 ## Scope and permission calculation
