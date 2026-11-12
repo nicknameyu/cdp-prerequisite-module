@@ -1,4 +1,8 @@
 # Change log for module cdp-prerequisite for Azure
+
+## v0.3.3 AWS RBAC
+- Add variables to control the RBAC for SPN/MI. 
+
 ## v0.3.2 AWS KMS bug fix
 - use R/W policy instead of readonly policy.
 
