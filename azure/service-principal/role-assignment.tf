@@ -1,7 +1,7 @@
 data "azurerm_subscription" "current" {}
 
 locals {
-  principals = merge({ spn = var.spn_object_id }, var.mi_object_id == null ? {} : { mi = var.mi_object_id } )
+  principals = merge({ spn = var.spn_object_id }, ! var.service_mi_rbac ? {} : { mi = var.mi_object_id } )
   rbac_scope = length(var.rbac_scope) == 0 ? {sub = data.azurerm_subscription.current.id} : var.rbac_scope
   role_assignments = {
     for pair in setproduct(keys(local.principals), keys(local.rbac_scope)) :
